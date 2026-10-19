@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://akku-rawat.github.io/sitemap.xml
