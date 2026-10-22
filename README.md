@@ -1,6 +1,6 @@
 # akku-rawat.github.io
 
-My portfolio: a small pixel observatory under a Starry Night sky, with my experience, skills and side projects, a résumé download, a lo-fi radio and a terminal you can type into.
+My portfolio: a small pixel observatory under a Starry Night sky, with my work, skills and side projects, a "Work with me" section for freelance clients, a résumé download and a terminal you can type into.
 
 Live at **https://akku-rawat.github.io**
 
@@ -10,7 +10,7 @@ Live at **https://akku-rawat.github.io**
 | --- | --- |
 | `index.html` | The page |
 | `assets/css/style.css` | Styles |
-| `assets/js/main.js` | The sky, pool table, lo-fi radio and the shell |
+| `assets/js/main.js` | The sky, pool table, mobile menu and the shell |
 | `Akhilesh_Rawat_Resume.pdf` | The résumé the site links to |
 | `404.html` | Page for links that go nowhere |
 | `favicon.svg`, `favicon.png`, `apple-touch-icon.png` | Icons |
@@ -21,13 +21,15 @@ No build step and no dependencies. GitHub Pages serves the files as they are.
 ## Run it locally
 
 ```bash
-python3 -m http.server 4000
+npm run dev
 ```
+
+This just runs `python3 -m http.server 4000`; there are no packages to install.
 
 Then open http://localhost:4000.
 
 ## Keeping it fresh
 
-- **Now:** edit the `now-list` items in `index.html` and the `updated` date above them.
 - **Résumé:** replace `Akhilesh_Rawat_Resume.pdf` with the new file, keeping the name.
-- **Projects and experience:** each card is an `<article class="entry">` in `index.html`. The terminal builds its files from these cards, so editing a card updates `cat work/<project>.md` too.
+- **Work:** the three case studies are `<article class="entry">` cards and the rest are `<li class="proj">` rows in `index.html`. The terminal builds its files from them, so editing one updates `cat work/<project>.md` too.
+- **Services and availability:** the `#services` section in `index.html`.

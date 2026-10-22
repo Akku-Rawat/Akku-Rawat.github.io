@@ -26,13 +26,6 @@
   const now = new Date();
   const syn = 29.530588853, ref = Date.UTC(2000, 0, 6, 18, 14);
   const ph = (((now - ref) / 864e5) % syn + syn) % syn / syn;
-  const illum = Math.round((1 - Math.cos(2 * Math.PI * ph)) / 2 * 100);
-  const phase = ['New moon', 'Waxing crescent', 'First quarter', 'Waxing gibbous', 'Full moon', 'Waning gibbous', 'Last quarter', 'Waning crescent'][Math.round(ph * 8) % 8];
-  const SHOWERS = [['Quadrantids', 0, 3], ['Lyrids', 3, 22], ['Eta Aquariids', 4, 6], ['Perseids', 7, 12], ['Orionids', 9, 21], ['Leonids', 10, 17], ['Geminids', 11, 14]];
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const next = SHOWERS.map(([n, m, d]) => { let dt = new Date(now.getFullYear(), m, d); if (dt < today) dt = new Date(now.getFullYear() + 1, m, d); return { n, dt }; }).sort((a, c) => a.dt - c.dt)[0];
-  const days = Math.round((next.dt - today) / 864e5);
-  const inDays = days === 0 ? 'peaks tonight' : `in ${days} day${days === 1 ? '' : 's'}`;
 
   const RESUME = 'Akhilesh_Rawat_Resume.pdf', EMAIL = 'akhileshrawat.asr@gmail.com', LINKEDIN = 'https://www.linkedin.com/in/akhilesh-rawat-asr', GITHUB = 'https://github.com/Akku-Rawat';
   const PROJ = {
@@ -49,18 +42,19 @@
     signboard: { name: 'Signboard', short: 'website builder for local businesses', dir: 'after-dark', star: [184, 81], label: 'SIGNBOARD' },
     chaos8: { name: 'Chaos 8', short: 'multiplayer pool in the browser', dir: 'after-dark', star: [250, 50], label: 'CHAOS 8' }
   };
-  const state = { lofi: false };
 
   const dlgText = $('dlgText');
+  const typing = !reduce && matchMedia('(min-width: 721px)').matches;
   let typer, dlgFull = dlgText.textContent;
   const dialogSay = txt => {
     dlgFull = txt; clearInterval(typer);
-    if (reduce) { dlgText.textContent = txt; return; }
+    if (!typing) { dlgText.textContent = txt; return; }
     let i = 0; dlgText.textContent = '';
     typer = setInterval(() => { i += 2; dlgText.textContent = txt.slice(0, i); if (i >= txt.length) clearInterval(typer); }, 22);
   };
+  if (matchMedia('(max-width: 720px)').matches) document.querySelectorAll('details.did').forEach(d => { d.open = false; });
   dlgText.addEventListener('click', () => { clearInterval(typer); dlgText.textContent = dlgFull; });
-  const goTo = id => { const el = $(id); if (!el) return; el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); if (el.classList.contains('entry')) { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1800); } };
+  const goTo = id => { const el = $(id); if (!el) return; el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); if (el.matches('.entry, .proj')) { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1800); } };
 
   const drawPatch = cvs => {
     cvs.width = 40; cvs.height = 40;
@@ -86,7 +80,7 @@
     P.r(10, 27, 7, 3, '#A9A2D0'); P.p(13, 24, '#120F26'); P.p(13, 25, '#120F26'); P.p(15, 28, '#FFCF6B');
     [[21, 31], [22, 32], [21, 33]].forEach(([x, y]) => P.p(x, y, '#7FD1B9')); P.r(24, 33, 4, 1, '#7FD1B9');
   };
-  drawPatch($('patch')); drawPatch($('portrait'));
+  drawPatch($('portrait'));
 
   const bank = (bg, acc) => [bg, P => { for (let y = 0; y < 4; y++) P.r(10 - y * 2, 3 + y, y * 4 + 1, 1, '#C9C2E6'); P.p(10, 5, acc); P.r(3, 7, 15, 1, '#8D86B0'); [5, 8, 11, 14].forEach(x => P.r(x, 9, 2, 6, '#EFE6D8')); P.r(3, 15, 15, 2, '#8D86B0'); P.r(3, 15, 15, 1, '#C9C2E6'); }];
   const ICONS = {
@@ -97,20 +91,17 @@
     chaos8: ['#1D3B2C', P => { P.circ(10, 10, 7, '#141018'); P.circ(8, 8, 3, '#F1E9D2'); P.p(8, 7, '#141018'); P.p(8, 9, '#141018'); P.p(13, 5, '#4A4370'); P.p(14, 6, '#4A4370'); }],
     signboard: ['#1F2E2A', P => { P.r(3, 3, 14, 1, '#8A6A4A'); [[6, 4], [6, 5], [14, 4], [14, 5]].forEach(([x, y]) => P.p(x, y, '#C9C2E6')); P.r(4, 6, 12, 8, '#EDBE6C'); P.r(4, 6, 12, 1, '#FFE09A'); P.r(6, 9, 8, 1, '#5A4A2E'); P.r(6, 11, 5, 1, '#5A4A2E'); P.circ(15, 16, 2, '#5FA36A'); P.p(15, 16, '#EFE6D8'); }],
     creddex: ['#353020', P => { P.circ(6, 10, 4, '#EDBE6C'); P.circ(6, 10, 2, '#353020'); P.r(9, 9, 9, 3, '#EDBE6C'); P.r(9, 9, 9, 1, '#FFE09A'); P.r(14, 12, 2, 3, '#EDBE6C'); P.r(17, 12, 1, 2, '#EDBE6C'); }],
-    'sk-domain': ['#2A2618', P => { P.r(3, 15, 9, 2, '#C98A3B'); P.r(3, 13, 9, 2, '#EDBE6C'); P.r(3, 11, 9, 2, '#C98A3B'); P.r(3, 9, 9, 2, '#EDBE6C'); P.r(3, 9, 9, 1, '#FFE09A'); P.line(11, 11, 16, 5, '#7FD1B9'); P.r(14, 4, 3, 1, '#7FD1B9'); P.r(16, 4, 1, 3, '#7FD1B9'); }],
     'sk-lang': ['#1F2E3A', P => { [[6, 6], [5, 7], [4, 8], [3, 9], [4, 10], [5, 11], [6, 12]].forEach(([x, y]) => P.p(x, y, '#7FD1B9')); P.line(11, 5, 8, 14, '#EDBE6C'); [[13, 6], [14, 7], [15, 8], [16, 9], [15, 10], [14, 11], [13, 12]].forEach(([x, y]) => P.p(x, y, '#7FD1B9')); }],
     'sk-front': ['#2A2238', P => { P.r(3, 4, 14, 12, '#C9C2E6'); P.r(3, 4, 14, 2, '#8D86B0'); P.p(4, 5, '#E0566E'); P.p(6, 5, '#EDBE6C'); P.p(8, 5, '#7FD1B9'); P.r(5, 8, 6, 1, '#5D5396'); P.r(5, 10, 9, 1, '#5D5396'); P.r(5, 12, 4, 2, '#7FB2C9'); P.r(11, 12, 4, 2, '#EBA3AE'); }],
     'sk-back': ['#1D2433', P => { for (let i = 0; i < 3; i++) { P.r(4, 3 + i * 5, 12, 4, '#5D5396'); P.r(4, 3 + i * 5, 12, 1, '#7C74B8'); P.p(6, 5 + i * 5, '#7FD1B9'); P.p(8, 5 + i * 5, '#EDBE6C'); P.r(11, 5 + i * 5, 4, 1, '#3E3770'); } }],
-    'sk-tools': ['#171622', P => { P.r(2, 4, 16, 12, '#0E0D16'); P.r(2, 4, 16, 1, '#8D86B0'); P.r(2, 15, 16, 1, '#8D86B0'); P.r(2, 4, 1, 12, '#8D86B0'); P.r(17, 4, 1, 12, '#8D86B0'); [[5, 8], [6, 9], [5, 10]].forEach(([x, y]) => P.p(x, y, '#7FD1B9')); P.r(8, 10, 4, 1, '#EDBE6C'); }],
     'sk-db': ['#1D2433', P => { P.r(4, 5, 12, 11, '#5D5396'); P.r(5, 3, 10, 1, '#9C94D8'); P.r(4, 4, 12, 2, '#7C74B8'); P.r(5, 16, 10, 1, '#3E3770'); P.r(4, 9, 12, 1, '#3E3770'); P.r(4, 13, 12, 1, '#3E3770'); P.p(13, 7, '#7FD1B9'); P.p(13, 11, '#EDBE6C'); P.p(13, 15, '#7FD1B9'); }],
-    'sk-sec': ['#2A2238', P => { P.r(6, 3, 8, 1, '#C9C2E6'); P.r(5, 4, 1, 5, '#C9C2E6'); P.r(14, 4, 1, 5, '#C9C2E6'); P.r(4, 9, 12, 9, '#EDBE6C'); P.r(4, 9, 12, 1, '#FFE09A'); P.r(4, 17, 12, 1, '#B8862E'); P.r(9, 12, 2, 3, '#3A2E22'); P.p(9, 15, '#3A2E22'); }],
-    'sk-practice': ['#1F2E2A', P => { P.r(4, 4, 12, 14, '#EFE6D8'); P.r(7, 3, 6, 2, '#8D86B0'); [7, 11, 15].forEach(y => { P.p(6, y, '#5FA36A'); P.p(7, y + 1, '#5FA36A'); P.p(8, y, '#5FA36A'); P.p(9, y - 1, '#5FA36A'); P.r(11, y, 4, 1, '#8D86B0'); }); }],
     lms: ['#1F2A3A', P => { P.r(3, 5, 14, 12, '#EFE6D8'); P.r(3, 5, 14, 3, '#7FB2C9'); P.r(6, 3, 1, 3, '#8D86B0'); P.r(13, 3, 1, 3, '#8D86B0'); for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) P.r(5 + c * 3, 10 + r * 2, 2, 1, r * 4 + c < 6 ? '#5FA36A' : '#8D86B0'); P.circ(15, 15, 3, '#EDBE6C'); P.r(15, 14, 1, 3, '#B8862E'); }],
     hrms: ['#2A2238', P => { P.r(4, 4, 12, 14, '#C9C2E6'); P.r(4, 4, 12, 3, '#8D86B0'); P.r(8, 2, 4, 3, '#5D5396'); P.r(9, 3, 2, 1, '#2A2238'); P.circ(10, 9, 2, '#E0B07A'); P.r(7, 12, 7, 3, '#7FD1B9'); P.r(6, 16, 9, 1, '#8D86B0'); }],
     mojaloop: ['#1D2A33', P => { P.line(5, 6, 15, 6, '#4E7F9A'); P.line(5, 6, 10, 15, '#4E7F9A'); P.line(15, 6, 10, 15, '#4E7F9A'); P.circ(5, 6, 2, '#7FD1B9'); P.circ(15, 6, 2, '#EDBE6C'); P.circ(10, 15, 2, '#29ADFF'); P.r(9, 5, 2, 2, '#EFE6D8'); P.p(7, 10, '#EFE6D8'); P.p(13, 10, '#EFE6D8'); }],
     'bank-sa': bank('#2A2418', '#EDBE6C'),
     'bank-gh': bank('#1A2A20', '#5FA36A'),
     'job-now': ['#2A2418', P => { const ring = []; for (let a = 0; a < 360; a += 6) { const t = a * Math.PI / 180; ring.push([Math.round(10 + Math.cos(t) * 8.5), Math.round(10 + Math.sin(t) * 2.4 - Math.cos(t) * 1.6), Math.sin(t) > 0]); } ring.filter(q => !q[2]).forEach(([x, y]) => P.p(x, y, '#9A7430')); P.circ(10, 10, 5, '#EDBE6C'); P.r(7, 7, 2, 2, '#FFE09A'); P.r(11, 13, 3, 1, '#C98A3B'); ring.filter(q => q[2]).forEach(([x, y]) => P.p(x, y, '#F1E9D2')); P.p(3, 3, '#F1E9D2'); P.p(17, 17, '#C9C2E6'); }],
+    edu: ['#1F2A3A', P => { [[9, 2], [7, 6], [5, 10], [3, 14], [5, 10], [7, 6]].forEach(([x, w], i) => P.r(x, 5 + i, w, 1, i < 4 ? '#C9C2E6' : '#8D86B0')); P.r(6, 11, 9, 3, '#5D5396'); P.r(6, 11, 9, 1, '#7C74B8'); P.r(16, 8, 1, 6, '#EDBE6C'); P.r(15, 14, 3, 2, '#EDBE6C'); }],
     'job-past': ['#16242A', P => { P.circ(9, 11, 6, '#5FB8A8'); P.r(6, 8, 2, 2, '#9FE3D2'); P.r(9, 15, 4, 1, '#3E8C80'); P.r(4, 12, 2, 1, '#3E8C80'); P.r(11, 9, 3, 1, '#4FA595'); P.circ(16, 4, 1, '#C9C2E6'); P.p(3, 3, '#F1E9D2'); }]
   };
   document.querySelectorAll('canvas[data-ico]').forEach(c => { const [bg, fn] = ICONS[c.dataset.ico]; c.width = 20; c.height = 20; const P = PX(c.getContext('2d')); P.r(0, 0, 20, 20, bg); fn(P); });
@@ -165,8 +156,7 @@
     const SWX = 222, SWY = 64, SPIN = Math.PI * 4.2;
     for (let arm = 0; arm < 2; arm++) for (let th = 0; th < SPIN; th += .045) { const rr = 1.5 + th * 1.12, a = th + arm * Math.PI; S.p(SWX + Math.cos(a) * rr, SWY + Math.sin(a) * rr * .8, Math.floor(th * 6) % 3 ? '#2A3577' : '#36468F'); }
     const HALOS = [[206, 12], [268, 9], [292, 46], [270, 70], [156, 100]];
-    const haloRing = (ctxP, hx, hy, boost) => { for (let y = -7; y <= 7; y++) for (let x = -7; x <= 7; x++) { const dd = Math.hypot(x, y), th = BY[(hy + y + 32) % 4][(hx + x + 32) % 4]; if (dd > 2.5 && dd < 3.6 && th < (boost ? 14 : 9)) ctxP.p(hx + x, hy + y, boost ? '#C9A85A' : '#7E6A3E'); else if (dd > 4.6 && dd < 5.7 && th < (boost ? 9 : 4)) ctxP.p(hx + x, hy + y, boost ? '#8E7A48' : '#4E4430'); } };
-    HALOS.forEach(([hx, hy]) => haloRing(S, hx, hy, false));
+    HALOS.forEach(([hx, hy]) => { for (let y = -7; y <= 7; y++) for (let x = -7; x <= 7; x++) { const dd = Math.hypot(x, y), th = BY[(hy + y + 32) % 4][(hx + x + 32) % 4]; if (dd > 2.5 && dd < 3.6 && th < 9) S.p(hx + x, hy + y, '#7E6A3E'); else if (dd > 4.6 && dd < 5.7 && th < 4) S.p(hx + x, hy + y, '#4E4430'); } });
     const MX = 300, MY = 18, MR = 8, wax = ph < .5, tc = Math.cos(2 * Math.PI * ph);
     for (let y = -15; y <= 15; y++) for (let x = -15; x <= 15; x++) { const dd = Math.hypot(x, y), th = BY[(MY + y + 32) % 4][(MX + x + 32) % 4]; if (dd > 9.5 && dd < 11 && th < 6) S.p(MX + x, MY + y, '#5C4E33'); else if (dd > 12.5 && dd < 14 && th < 3) S.p(MX + x, MY + y, '#463B2B'); }
     for (let y = -MR; y <= MR; y++) for (let x = -MR; x <= MR; x++) {
@@ -233,7 +223,7 @@
     const flies = Array.from({ length: 10 }, () => ({ x: 30 + r() * 285, y: 120 + r() * 18, ph: r() * 6.28 }));
     const LBL = { mail: 'SAY HI', cat: 'PET THE CAT', me: "THAT'S ME", obs: 'TELESCOPE' };
     const PIV = [284, 88];
-    let ang = -1.3, hover = null, pointer = null, lockId = null, lockUntil = 0, catUntil = 0, boostUntil = 0, shoots = [], vis = false, last = 0;
+    let ang = -1.3, hover = null, pointer = null, lockId = null, lockUntil = 0, catUntil = 0, shoots = [], vis = false, last = 0;
 
     const hit = (x, y) => {
       for (const id of Object.keys(PROJ)) { const [sx, sy] = PROJ[id].star; const big = id === 'chaos8'; if (Math.hypot(x - sx - (big ? 0 : .5), y - sy - (big ? 0 : .5)) < (big ? 11 : 6)) return id; }
@@ -249,15 +239,14 @@
     const loc = e => { const b = cv.getBoundingClientRect(); return [(e.clientX - b.left) / b.width * W, (e.clientY - b.top) / b.height * H]; };
 
     const draw = t => {
-      const T = reduce ? 0 : t, nowMs = performance.now(), pulse = reduce ? 1 : Math.round(Math.sin(T * .008) + 1), boost = nowMs < boostUntil;
+      const T = reduce ? 0 : t, nowMs = performance.now(), pulse = reduce ? 1 : Math.round(Math.sin(T * .008) + 1);
       g.drawImage(skyC, 0, 0);
       if (!reduce) {
         const off = (T * .012) % 24;
-        BANDS.forEach(b => { for (let x = b.x0 + off; x < b.x1; x += boost ? 12 : 24) for (let k = 0; k < 4; k++) { const xx = x + k, y = bandY(b, xx); if (y < back(xx) - 3 && !titleZone(xx, y)) G.p(xx, y, boost ? '#8FA6EC' : '#4A5DB0'); } });
+        BANDS.forEach(b => { for (let x = b.x0 + off; x < b.x1; x += 24) for (let k = 0; k < 4; k++) { const xx = x + k, y = bandY(b, xx); if (y < back(xx) - 3 && !titleZone(xx, y)) G.p(xx, y, '#4A5DB0'); } });
         const th0 = (T * .0016) % SPIN;
-        for (let arm = 0; arm < 2; arm++) for (let k = 0; k < (boost ? 30 : 8); k++) { const th = (th0 + k * .06) % SPIN, rr = 1.5 + th * 1.12, a = th + arm * Math.PI; G.p(SWX + Math.cos(a) * rr, SWY + Math.sin(a) * rr * .8, boost ? '#A9BBF2' : '#5266B8'); }
+        for (let arm = 0; arm < 2; arm++) for (let k = 0; k < 8; k++) { const th = (th0 + k * .06) % SPIN, rr = 1.5 + th * 1.12, a = th + arm * Math.PI; G.p(SWX + Math.cos(a) * rr, SWY + Math.sin(a) * rr * .8, '#5266B8'); }
       }
-      if (boost) { HALOS.forEach(([hx, hy]) => haloRing(G, hx, hy, true)); }
       HALOS.forEach(([hx, hy], i) => G.r(hx, hy, 2, 2, Math.sin(T * .0024 + i * 1.7) > -.2 ? '#FFF4C8' : '#E9C46A'));
       tw.forEach(s => { const v = Math.sin(T * .0021 * s.sp + s.ph); G.p(s.x, s.y, v > .35 ? s.c : s.d); if (s.big && v > .85) { G.p(s.x - 1, s.y, s.d); G.p(s.x + 1, s.y, s.d); G.p(s.x, s.y - 1, s.d); G.p(s.x, s.y + 1, s.d); } });
       const focus = lockId && nowMs < lockUntil ? lockId : null;
@@ -294,7 +283,6 @@
       G.spr(CAT, { o: '#D08A4E', e: blink ? '#D08A4E' : '#2A1810', n: '#E7A0A0' }, 244, 103);
       const tail = Math.round(Math.sin(T * .003) * 1.2);
       G.p(251, 110, '#D08A4E'); G.p(252, 109 + tail, '#D08A4E'); G.p(252, 108 + tail, '#D08A4E');
-      if (state.lofi) [0, 5].forEach((off, i) => { const p = (Math.floor(T / 240) + off) % 10, x = 236 + i * 5 + (p % 2), y = 97 - p, c = i ? '#EDBE6C' : '#7FD1B9'; G.r(x + 1, y, 2, 1, c); G.r(x + 1, y + 1, 1, 3, c); G.r(x, y + 3, 2, 2, c); });
       g.drawImage(frontC, 0, 0);
       if (nowMs < catUntil) { G.r(239, 92, 21, 9, '#F1E9D2'); G.p(247, 101, '#F1E9D2'); G.p(248, 102, '#F1E9D2'); G.text('MRRP', 242, 94, '#2A2238'); }
       flies.forEach(f => { const x = f.x + Math.sin(T * .0006 + f.ph) * 10, y = f.y + Math.sin(T * .0011 + f.ph * 2) * 4; if (Math.sin(T * .003 + f.ph) > .1) G.p(x, y, '#E8FF7A'); });
@@ -323,10 +311,7 @@
     requestAnimationFrame(loop);
     return {
       pointAt: id => { lockId = id; lockUntil = performance.now() + 5000; },
-      meow: () => { catUntil = performance.now() + 1600; },
-      shoot: () => spawn(),
-      shower: n => { for (let i = 0; i < n; i++) spawn(i * 6); },
-      starry: () => { boostUntil = performance.now() + 12000; }
+      shower: n => { for (let i = 0; i < n; i++) spawn(i * 6); }
     };
   })();
 
@@ -394,78 +379,42 @@
     requestAnimationFrame(loop);
   })();
 
-  $('tmMoon').textContent = `☾ ${illum}%`;
-  $('nowSky').textContent = `Moon ${illum}% lit, ${phase.toLowerCase()}. ${next.n} ${days === 0 ? 'peak tonight' : `peak in ${days} day${days === 1 ? '' : 's'}`}.`;
-  (() => {
-    const c = $('nowMoon'); c.width = 24; c.height = 24; const P = PX(c.getContext('2d')), wax = ph < .5, tc = Math.cos(2 * Math.PI * ph), R0 = 7;
-    P.r(0, 0, 24, 24, '#141325');
-    [[3, 4], [20, 3], [19, 20], [4, 19], [12, 1]].forEach(([x, y], i) => P.p(x, y, i % 2 ? '#C9C4DA' : '#EDBE6C'));
-    for (let y = -R0; y <= R0; y++) for (let x = -R0; x <= R0; x++) { if (x * x + y * y > R0 * R0 + R0 * .8) continue; const chord = Math.sqrt(Math.max(.01, R0 * R0 - y * y)), xs = x / chord, lit = wax ? xs > tc : xs < -tc; P.p(12 + x, 12 + y, lit ? ((x * 5 + y * 3 + 40) % 11 === 0 ? '#D4CBB2' : '#F1E9D2') : '#272545'); }
-  })();
   const yrsMos = (y, m) => { const n = (now.getFullYear() - y) * 12 + now.getMonth() - m + 2, yr = Math.floor(n / 12), mo = n % 12; return [yr && `${yr} yr${yr > 1 ? 's' : ''}`, mo && `${mo} mo${mo > 1 ? 's' : ''}`].filter(Boolean).join(' '); };
   document.querySelectorAll('[data-since]').forEach(el => { const [y, m] = el.dataset.since.split('-').map(Number); el.textContent = yrsMos(y, m); });
   const tick = () => { $('tmClock').textContent = hhmm(new Date()); };
   tick(); setInterval(tick, 30000);
 
-  const wins = [...document.querySelectorAll('.wins a')], secs = ['home', 'experience', 'skills', 'projects', 'now', 'console', 'contact'].map(id => $(id));
+  const wins = [...document.querySelectorAll('.wins a')], secs = ['home', 'work', 'skills', 'projects', 'services', 'contact'].map(id => $(id));
   const spy = () => { let cur = 'home'; secs.forEach(s => { if (s.getBoundingClientRect().top < innerHeight * .4) cur = s.id; }); wins.forEach(a => a.classList.toggle('on', a.dataset.win === cur)); };
   addEventListener('scroll', spy, { passive: true }); spy();
-
-  const amb = $('amb'), radioBtn = $('radioBtn'), radioEl = $('radio'), radioState = $('radioState'), hz = m => 440 * Math.pow(2, (m - 69) / 12);
-  const CH = [[57, 60, 64, 67], [53, 57, 60, 64], [48, 52, 55, 59], [55, 59, 62, 65]], CHN = ['Am7', 'Fmaj7', 'Cmaj7', 'G7'], ARP = [0, 2, 1, 3, 2, 1, 3, 2];
-  let ac, master, timer, beat = 0;
-  const tone = (f, t, dur, type, vol, atk = .02) => { const o = ac.createOscillator(), gn = ac.createGain(); o.type = type; o.frequency.value = f; gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(vol, t + atk); gn.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(gn); gn.connect(master); o.start(t); o.stop(t + dur + .05); };
-  const beatStep = () => { const t = ac.currentTime + .06, ci = Math.floor(beat / 16) % 4, c = CH[ci]; if (beat % 16 === 0) { c.forEach(m => tone(hz(m - 12), t, 4.8, 'triangle', .035, .6)); radioState.textContent = `playing · ${CHN[ci]} · made live in your browser`; } if (beat % 8 === 0) tone(hz(c[0] - 24), t, 1.4, 'sine', .12); if (beat % 2 === 0 && Math.random() > .15) tone(hz(c[ARP[(beat / 2) % 8]] + 12), t, .6, 'sine', .045); beat++; };
-  const setLofiUI = v => {
-    amb.setAttribute('aria-pressed', String(v)); amb.textContent = v ? '♪ lo-fi on' : '♪ lo-fi off';
-    radioBtn.setAttribute('aria-pressed', String(v)); radioBtn.querySelector('.pi').textContent = v ? '❚❚' : '▶';
-    radioBtn.setAttribute('aria-label', v ? 'Pause night radio' : 'Play night radio');
-    radioEl.classList.toggle('on', v);
-    if (!v) radioState.textContent = 'lo-fi, made live in your browser';
-  };
-  const lofi = want => {
-    try {
-      if (want === state.lofi) return state.lofi;
-      if (!ac) {
-        ac = new (window.AudioContext || window.webkitAudioContext)();
-        master = ac.createGain(); master.gain.value = 0;
-        const lp = ac.createBiquadFilter(), dl = ac.createDelay(), fb = ac.createGain(), wet = ac.createGain();
-        lp.type = 'lowpass'; lp.frequency.value = 1500; dl.delayTime.value = .36; fb.gain.value = .32; wet.gain.value = .28;
-        master.connect(lp); lp.connect(ac.destination); lp.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(wet); wet.connect(ac.destination);
-      }
-      state.lofi = want; setLofiUI(want);
-      const t = ac.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t);
-      if (want) { ac.resume(); beat = 0; master.gain.linearRampToValueAtTime(.85, t + 1.2); beatStep(); timer = setInterval(beatStep, 300); }
-      else { master.gain.linearRampToValueAtTime(0, t + .6); clearInterval(timer); }
-    } catch (e) { amb.textContent = '♪ unavailable'; radioState.textContent = "audio isn't available here"; }
-    return state.lofi;
-  };
-  amb.addEventListener('click', () => lofi(!state.lofi));
-  radioBtn.addEventListener('click', () => lofi(!state.lofi));
+  const tm = document.querySelector('.tmux'), menuBtn = $('menuBtn');
+  const setMenu = v => { tm.classList.toggle('open', v); menuBtn.setAttribute('aria-expanded', String(v)); menuBtn.textContent = v ? 'close ▴' : 'menu ▾'; };
+  menuBtn.addEventListener('click', () => setMenu(!tm.classList.contains('open')));
+  wins.forEach(a => a.addEventListener('click', () => setMenu(false)));
+  addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
 
   (() => {
-    const out = $('out'), inp = $('cmd'), ps1 = $('ps1'), stMode = $('stMode'), stCwd = $('stCwd'), stCount = $('stCount'), title = $('termTitle');
+    const out = $('out'), inp = $('cmd'), ps1 = $('ps1'), stMode = $('stMode'), stCwd = $('stCwd'), stCount = $('stCount'), title = $('termTitle'), term = $('term'), toggle = $('termToggle');
     const txt = el => el ? el.textContent.replace(/\s+/g, ' ').trim() : '';
-    const md = (head, meta, sum, pts, stack) => [`# ${head}`, `@ ${meta}`, sum, '', ...pts.map(p => `- ${p}`), '', `stack  ${stack}`].join('\n');
-    const cardMd = el => md(txt(el.querySelector('h3')), txt(el.querySelector('.e-meta')), txt(el.querySelector('.e-sum')), [...el.querySelectorAll('.e-pts li')].map(txt), [...el.querySelectorAll('.tags span')].map(txt).join(' · '));
+    const clean = el => { if (!el) return ''; const c = el.cloneNode(true); c.querySelectorAll('.lab').forEach(x => x.remove()); return txt(c); };
+    const md = (head, meta, sum, pts, outcome, stack) => [`# ${head}`, `@ ${meta}`, sum, ...(pts.length ? ['', ...pts.map(p => `- ${p}`)] : []), ...(outcome ? ['', `outcome  ${outcome}`] : []), '', `stack  ${stack}`].join('\n');
+    const cardMd = el => md(txt(el.querySelector('h3, h4')), txt(el.querySelector('.e-meta')), clean(el.querySelector('.e-sum, p')), [...el.querySelectorAll('.e-pts li')].map(txt), clean(el.querySelector('.e-out')), [...el.querySelectorAll('.tags span')].map(txt).join(' · '));
     const dirOf = d => Object.fromEntries(Object.keys(PROJ).filter(id => PROJ[id].dir === d && $('p-' + id)).map(id => [`${id}.md`, cardMd($('p-' + id))]));
     const SKILLS = [...document.querySelectorAll('.srow')].map(r => [r.dataset.k, [...r.querySelectorAll('.chip')].map(c => (c.classList.contains('core') ? '★ ' : '') + txt(c))]);
-    const NOW = [...document.querySelectorAll('.now-list li')].map(li => { const v = li.querySelector('span'); return [txt(li.querySelector('b')), v.classList.contains('tbd') ? `(${txt(v)})` : txt(v)]; }).concat([['sky', `${next.n} ${inDays}, moon ${illum}% lit`]]);
     const JOBS = [
-      { role: 'Software Developer', co: 'Rolaface Softwares', when: 'Jul 2023 – present', where: 'Dehradun, India', ids: ['los', 'lms', 'hrms', 'erp', 'recon', 'tazama', 'mojaloop'] },
-      { role: 'Backend Developer', co: 'Kaveosoft Innovations', when: 'Jun 2021 – Jul 2023', where: 'Haldwani, India', ids: ['access-sa', 'access-gh'] }
+      { role: 'Software Developer', co: 'Rolaface Softwares', when: 'Jul 2023 – present', ids: ['los', 'tazama', 'erp', 'lms', 'hrms', 'recon', 'mojaloop'] },
+      { role: 'Backend Developer', co: 'Kaveosoft Innovations', when: 'Jun 2021 – Jul 2023', ids: ['access-sa', 'access-gh'] }
     ];
     const EDU = 'B.Tech, Computer Science and Engineering\nGraphic Era (Deemed to be University), Dehradun\n2019 – 2023 · CGPA 8.44';
     const FS = {
-      'about.txt': 'Akhilesh Rawat\nFull-stack developer and technical lead · Dehradun, India\n\n5+ years designing, building and shipping fintech, lending,\nHR and ERP platforms with React, TypeScript, Node.js,\nPython and Java. Tech lead for the open-source Tazama case\nmanagement system and an HRMS on Frappe, and a contributor\nto the open-source Mojaloop payments platform.\n\nAfter dark: pixel art, games, music, manga and the night sky.',
-      'experience.txt': JOBS.map(j => `# ${j.role} @ ${j.co}\n@ ${j.when} · ${j.where}\n${j.ids.map(id => '- ' + PROJ[id].name).join('\n')}`).join('\n\n'),
+      'about.txt': 'Akhilesh Rawat\nFull-stack developer · Dehradun, India\n\n5+ years building lending, payments, ERP, accounting\nand HR software with React, TypeScript, Node.js,\nPython and Java. Technical lead on Tazama and an HRMS,\nplus the DevOps side: Docker, CI/CD, production support.\n\nAfter dark: pixel art, games and the night sky.',
+      'experience.txt': JOBS.map(j => `# ${j.role} @ ${j.co}\n@ ${j.when}\n${j.ids.map(id => '- ' + PROJ[id].name).join('\n')}`).join('\n\n'),
       'education.txt': EDU,
       'skills.txt': SKILLS.map(([k, v]) => `${k.padEnd(10)} ${v.join(' · ')}`).join('\n') + '\n\n★ = main stack',
-      'now.txt': NOW.map(([k, v]) => `${k.padEnd(10)} ${v}`).join('\n'),
-      'contact.txt': `email     ${EMAIL}\nlinkedin  linkedin.com/in/akhilesh-rawat-asr\ngithub    github.com/Akku-Rawat\nrésumé    open resume.pdf`,
+      'contact.txt': `email     ${EMAIL}\nlinkedin  linkedin.com/in/akhilesh-rawat-asr\ngithub    github.com/Akku-Rawat`,
       'resume.pdf': null,
-      '.secrets': "it's just a list of meteor showers.\nquadrantids, lyrids, eta aquariids, perseids, orionids, leonids, geminids.\nalso: try the konami code on this page.",
-      '.zshrc': "alias hire='open resume.pdf && mail akhilesh'\nexport SKY=starry\nexport COFFEE=probably",
+      '.secrets': "nothing to see here.\nok, one thing: try the konami code on this page.",
+      '.zshrc': "alias hire='open resume.pdf'\nexport SKY=starry\nexport COFFEE=probably",
       work: dirOf('work'),
       'after-dark': dirOf('after-dark')
     };
@@ -488,17 +437,14 @@
     const leven = (a, b) => { const m = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]); for (let j = 1; j <= b.length; j++) m[0][j] = j; for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) m[i][j] = Math.min(m[i - 1][j] + 1, m[i][j - 1] + 1, m[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return m[a.length][b.length]; };
     const link = (k, label, href) => print([{ t: k.padEnd(10), c: 'k' }, { t: label, href }]);
     const openUrl = (href, label) => { print([{ t: '→ opening ', c: 'd' }, { t: label, href }]); try { window.open(href, '_blank', 'noopener'); } catch (e) { } };
-    const FACTS = ["Benford's Law: in a lot of real-world data, about 30% of numbers start with a 1. Tazama's fraud charts include a Benford's Law analysis.", 'The Mojaloop reporting APIs support 100k+ transactions a day.', "The ERP's e-invoicing integration passed the Zambia Revenue Authority's certification.", 'The loan origination rule engines look at 20+ applicant variables.', 'Creddex encrypts every secret with AES-256-GCM.', 'Chaos 8 has 14 chaos modifiers, plus dares and power-ups.', "The moon on the hill is tonight's real phase.", "The sky's swirls are borrowed from Van Gogh's The Starry Night."];
-    let factI = Math.floor(Math.random() * FACTS.length);
 
     const CMDS = {
       help() {
         const row = (label, cmds) => { const parts = [{ t: label.padEnd(10), c: 'k' }]; cmds.forEach((c, i) => { parts.push({ t: c, cmd: c.startsWith('cd ') ? `${c} && ls` : c }); if (i < cmds.length - 1) parts.push('  '); }); print(parts); };
         row('about me', ['whoami', 'experience', 'skills', 'education', 'resume', 'contact']);
         row('explore', ['ls', 'cd work', 'cat about.txt', 'tree', 'grep react', 'open los']);
-        row('the sky', ['sky', 'point tazama', 'wish', 'starry']);
-        row('just fun', ['neofetch', 'now', 'meow', 'lofi', 'sudo', 'vim']);
-        print(''); print({ t: 'tab completes · ↑↓ history · ctrl+l clears · ` jumps here from anywhere', c: 'd' });
+        row('extras', ['neofetch', 'point tazama', 'history', 'clear']);
+        print(''); print({ t: 'tab completes · ↑↓ history · ctrl+l clears · ` opens this from anywhere', c: 'd' });
       },
       ls(a) {
         const all = a.some(x => /^-\w*a/.test(x)), target = a.find(x => !x.startsWith('-')), segs = target ? resolve(target) : cwd, n = get(segs);
@@ -548,42 +494,33 @@
       echo(a, raw) { print(raw.replace(/^echo\s*/, '').replace(/^["']|["']$/g, '').replace(/\$SKY/g, 'starry').replace(/\$USER/g, 'akku')); },
       history() { hist.forEach((h, i) => print([{ t: String(i + 1).padStart(4) + '  ', c: 'd' }, { t: h, cmd: h }])); },
       clear() { out.innerHTML = ''; queue = []; },
-      whoami() { print({ t: 'akhilesh rawat · full-stack developer and technical lead', c: 'h' }); print('5+ years in fintech, lending, HR and ERP · dehradun, india'); print([{ t: 'more: ', c: 'd' }, { t: 'experience', cmd: 'experience' }, { t: ' · ', c: 'd' }, { t: 'skills', cmd: 'skills' }, { t: ' · ', c: 'd' }, { t: 'resume', cmd: 'resume' }]); },
+      whoami() { print({ t: 'akhilesh rawat · full-stack developer', c: 'h' }); print('5+ years in lending, payments, ERP, accounting and HR'); print('technical lead and devops experience'); print([{ t: 'more: ', c: 'd' }, { t: 'experience', cmd: 'experience' }, { t: ' · ', c: 'd' }, { t: 'skills', cmd: 'skills' }, { t: ' · ', c: 'd' }, { t: 'resume', cmd: 'resume' }]); },
       experience() {
         JOBS.forEach((j, i) => {
           if (i) print('');
           print([{ t: j.role, c: 'h' }, ` @ ${j.co}`]);
-          print({ t: `${j.when} · ${j.where}`, c: 'd' });
+          print({ t: j.when, c: 'd' });
           j.ids.forEach(id => print([{ t: '  ✦ ', c: 'h' }, { t: PROJ[id].name, cmd: `cat ~/work/${id}.md` }, { t: ` · ${PROJ[id].short}`, c: 'd' }]));
         });
         print(''); print([{ t: 'education ', c: 'k' }, 'B.Tech CSE, Graphic Era University, 2019–2023, CGPA 8.44']);
       },
       education() { lines(EDU); },
       neofetch() {
-        const logo = ['      *     .      *', '  .      _____      .', "       .'  |  '.", '      /    |    \\    *', '     |_____|_____|', '     |  []   []  |', '  ___|_____[]____|___', '', '', ''];
-        const info = [[{ t: 'akku', c: 'u' }, { t: '@', c: 'd' }, { t: 'observatory', c: 'u' }], [{ t: '────────────────', c: 'd' }], ...[['name', 'Akhilesh Rawat'], ['role', 'Full-stack developer · tech lead'], ['exp', '5+ years'], ['work', 'Rolaface Softwares'], ['focus', 'lending · payments · fraud · ERP'], ['stack', 'React · TS · Node · Python · Java'], ['shell', 'zsh, obviously'], ['moon', `${phase.toLowerCase()}, ${illum}% lit`]].map(([k, v]) => [{ t: k.padEnd(8), c: 'k' }, v])];
+        const logo = ['      *     .      *', '  .      _____      .', "       .'  |  '.", '      /    |    \\    *', '     |_____|_____|', '     |  []   []  |', '  ___|_____[]____|___', '', ''];
+        const info = [[{ t: 'akku', c: 'u' }, { t: '@', c: 'd' }, { t: 'observatory', c: 'u' }], [{ t: '────────────────', c: 'd' }], ...[['name', 'Akhilesh Rawat'], ['role', 'Full-stack developer'], ['also', 'tech lead · devops'], ['exp', '5+ years'], ['focus', 'lending · payments · fraud · ERP'], ['stack', 'React · TS · Node · Python · Java']].map(([k, v]) => [{ t: k.padEnd(8), c: 'k' }, v])];
         const narrow = out.clientWidth < 600;
         info.forEach((parts, i) => print(narrow ? parts : [{ t: (logo[i] || '').padEnd(24), c: 'logo' }, ...parts]));
         print([{ t: narrow ? '' : ' '.repeat(24) }, ...['#EDBE6C', '#7FD1B9', '#9DA3F2', '#EBA3AE', '#E0566E', '#B49AD8'].map(c => ({ t: '██', c: 'sw' + c.slice(1) }))]);
       },
       skills() { SKILLS.forEach(([k, v]) => print([{ t: k.padEnd(11), c: 'k' }, v.join(' · ')])); print({ t: '★ = main stack', c: 'd' }); },
-      now() { NOW.forEach(([k, v]) => print([{ t: k.padEnd(11), c: 'k' }, v])); },
-      sky() { print({ t: `local time ${hhmm(new Date())}. always night at the observatory.`, c: 'h' }); print(`moon     ${phase.toLowerCase()}, ${illum}% lit`); print(`meteors  ${next.n} ${inDays}`); print([{ t: 'try: ', c: 'd' }, { t: 'starry', cmd: 'starry' }, { t: ' or ', c: 'd' }, { t: 'point chaos8', cmd: 'point chaos8' }]); },
-      moon() { print(`${phase.toLowerCase()}, ${illum}% lit`); },
-      meteors() { print(`${next.n} · ${inDays}`); },
       point(a) { const id = (a[0] || '').toLowerCase(); if (!PROJ[id]) return print({ t: a[0] ? `point: can't find ${a[0]} in the sky. try ls work` : 'usage: point <project>   try: point tazama', c: 'd' }); print({ t: `slewing the telescope to ${PROJ[id].name} ↑`, c: 'h' }); goTo('home'); setTimeout(() => hero.pointAt(id), reduce ? 0 : 500); },
-      wish() { factI = (factI + 1) % FACTS.length; print({ t: 'a shooting star crosses the hill. fun fact:', c: 'h' }); print(FACTS[factI]); hero.shoot(); },
-      meow() { hero.meow(); print('mrrp. the cat approves of your commit.'); },
-      lofi() { print(lofi(!state.lofi) ? 'lo-fi on ♪  (look at the bench)' : 'lo-fi off'); },
-      starry() { hero.starry(); print({ t: 'Starry Night mode for 12 seconds. Look up ↑', c: 'h' }); goTo('home'); },
-      hire() { print({ t: 'excellent choice.', c: 'h' }); link('email', EMAIL, 'mailto:' + EMAIL); link('linkedin', 'linkedin.com/in/akhilesh-rawat-asr', LINKEDIN); link('github', 'github.com/Akku-Rawat', GITHUB); link('résumé', RESUME, RESUME); },
+      hire() { link('email', EMAIL, 'mailto:' + EMAIL); link('linkedin', 'linkedin.com/in/akhilesh-rawat-asr', LINKEDIN); link('github', 'github.com/Akku-Rawat', GITHUB); link('résumé', RESUME, RESUME); },
       sudo(a) { if (a.join(' ').toLowerCase().includes('hire')) { print({ t: 'permission granted.', c: 'h' }); return CMDS.hire(); } print({ t: 'permission denied. the telescope only answers to akku.', c: 'err' }); },
       rm() { print({ t: 'rm: the stars are read-only.', c: 'err' }); },
       vim() { print("opening vim… just kidding. you'd never get out. (it's :q)"); },
-      exit() { print('logout? the meteors are just getting started.'); },
-      date() { print(new Date().toString()); }
+      exit() { close(); }
     };
-    Object.assign(CMDS, { fortune: CMDS.wish, music: CMDS.lofi, play: CMDS.lofi, vangogh: CMDS.starry, man: CMDS.help, cls: CMDS.clear, nano: CMDS.vim, emacs: CMDS.vim, contact: CMDS.hire, email: CMDS.hire, mail: CMDS.hire, jobs: CMDS.experience, ll: () => CMDS.ls(['-a']), about: () => CMDS.cat(['about.txt']), resume: () => CMDS.open(['resume']), cv: () => CMDS.open(['resume']), linkedin: () => CMDS.open(['linkedin']), github: () => CMDS.open(['github']), cat8: CMDS.meow });
+    Object.assign(CMDS, { man: CMDS.help, cls: CMDS.clear, nano: CMDS.vim, emacs: CMDS.vim, contact: CMDS.hire, email: CMDS.hire, mail: CMDS.hire, jobs: CMDS.experience, ll: () => CMDS.ls(['-a']), about: () => CMDS.cat(['about.txt']), resume: () => CMDS.open(['resume']), cv: () => CMDS.open(['resume']), linkedin: () => CMDS.open(['linkedin']), github: () => CMDS.open(['github']) });
 
     const run = raw => {
       const v = raw.trim(); if (!v) return;
@@ -610,6 +547,15 @@
       if (pre.length > tok.length) inp.value = before + pre;
       else { echoCmd(v); print({ t: opts.join('   '), c: 'd' }); }
     };
+    const open = focus => {
+      if (term.hidden) {
+        term.hidden = false; toggle.setAttribute('aria-expanded', 'true'); toggle.textContent = 'Hide the terminal ▾';
+        if (!greeted) { greeted = true; print({ t: `Last login: ${now.toDateString()} ${hhmm(now)} from your browser`, c: 'd' }); run('neofetch'); print([{ t: 'type ', c: 'd' }, { t: 'help', cmd: 'help' }, { t: ', click anything underlined, or try ', c: 'd' }, { t: 'experience', cmd: 'experience' }]); }
+      }
+      if (focus) setTimeout(() => inp.focus({ preventScroll: true }), reduce ? 0 : 450);
+    };
+    const close = () => { term.hidden = true; toggle.setAttribute('aria-expanded', 'false'); toggle.textContent = 'Try the terminal ▸'; toggle.focus({ preventScroll: true }); };
+    toggle.addEventListener('click', () => term.hidden ? open(true) : close());
     $('form').addEventListener('submit', e => { e.preventDefault(); run(inp.value); inp.value = ''; });
     inp.addEventListener('keydown', e => {
       if (e.key === 'Tab' && inp.value) { e.preventDefault(); complete(); }
@@ -621,14 +567,12 @@
     inp.addEventListener('focus', () => { stMode.textContent = 'INSERT'; stMode.classList.add('ins'); });
     inp.addEventListener('blur', () => { stMode.textContent = 'NORMAL'; stMode.classList.remove('ins'); });
     out.addEventListener('click', e => { if (!e.target.closest('button, a') && !String(window.getSelection())) inp.focus({ preventScroll: true }); });
-    document.querySelectorAll('.cheats [data-cmd]').forEach(btn => btn.addEventListener('click', () => run(btn.dataset.cmd)));
+    document.querySelectorAll('.runs [data-cmd]').forEach(btn => btn.addEventListener('click', () => { run(btn.dataset.cmd); inp.focus({ preventScroll: true }); }));
     addEventListener('keydown', e => {
       if (e.key !== '`' || e.ctrlKey || e.metaKey || e.altKey) return;
       const t = e.target; if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-      e.preventDefault(); $('console').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); setTimeout(() => inp.focus({ preventScroll: true }), reduce ? 0 : 500);
+      e.preventDefault(); open(false); $('console').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); setTimeout(() => inp.focus({ preventScroll: true }), reduce ? 0 : 500);
     });
-    print({ t: `Last login: ${now.toDateString()} ${hhmm(now)} from your browser`, c: 'd' });
-    watch($('term'), v => { if (!v || greeted) return; greeted = true; run('neofetch'); print([{ t: 'type ', c: 'd' }, { t: 'help', cmd: 'help' }, { t: ', click anything underlined, or try ', c: 'd' }, { t: 'experience', cmd: 'experience' }]); });
     updatePS1();
   })();
 
@@ -636,5 +580,5 @@
   let kpos = 0;
   addEventListener('keydown', e => { if (e.target && e.target.tagName === 'INPUT') return; const k = e.key.toLowerCase(); kpos = k === KON[kpos] ? kpos + 1 : k === KON[0] ? 1 : 0; if (kpos === KON.length) { kpos = 0; hero.shower(24); dialogSay('Meteor shower unlocked. Make a wish.'); } });
 
-  if (!reduce) { const t0 = dlgFull; dlgText.textContent = ''; setTimeout(() => dialogSay(t0), 250); }
+  if (typing) { const t0 = dlgFull; dlgText.textContent = ''; setTimeout(() => dialogSay(t0), 250); }
 })();
