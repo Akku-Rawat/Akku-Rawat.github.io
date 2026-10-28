@@ -7,7 +7,6 @@
   const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
   const lift = (c, a) => c.map(v => Math.min(255, v + a));
   const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
-  const hhmm = d => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   const FONT = { A: '010101111101101', B: '110101110101110', C: '011100100100011', D: '110101101101110', E: '111100110100111', F: '111100110100100', G: '011100101101011', H: '101101111101101', I: '111010010010111', J: '001001001101010', K: '101101110101101', L: '100100100100111', M: '101111111101101', N: '110101101101101', O: '010101101101010', P: '110101110100100', Q: '010101101110011', R: '110101110101101', S: '011100010001110', T: '111010010010010', U: '101101101101111', V: '101101101101010', W: '101101111111101', X: '101101010101101', Y: '101101010010010', Z: '111001010100111', 0: '111101101101111', 1: '010110010010111', 2: '110001010100111', 3: '110001010001110', 4: '101101111001001', 5: '111100110001110', 6: '011100111101111', 7: '111001010010010', 8: '111101111101111', 9: '111101111001110', '.': '000000000000010', '-': '000000111000000', '!': '010010010000010', '?': '110001010000010', "'": '010010000000000', ':': '000010000010000' };
   const FB = {}; Object.keys(FONT).forEach(k => FB[k] = [...FONT[k]].map(Number));
   const PX = ctx => {
@@ -27,20 +26,19 @@
   const syn = 29.530588853, ref = Date.UTC(2000, 0, 6, 18, 14);
   const ph = (((now - ref) / 864e5) % syn + syn) % syn / syn;
 
-  const RESUME = 'Akhilesh_Rawat_Resume.pdf', EMAIL = 'akhileshrawat.asr@gmail.com', LINKEDIN = 'https://www.linkedin.com/in/akhilesh-rawat-asr', GITHUB = 'https://github.com/Akku-Rawat';
   const PROJ = {
-    los: { name: 'Loan Origination System', short: 'application to e-signed offer and booked loan', dir: 'work', star: [170, 24], label: 'LOS' },
-    lms: { name: 'Loan Management System', short: 'loan products, schedules, arrears and statements', dir: 'work', star: [190, 32], label: 'LMS' },
-    hrms: { name: 'HRMS', short: 'tech lead · HR workflows and statutory payroll', dir: 'work', star: [160, 38], label: 'HRMS' },
-    erp: { name: 'ERP System', short: 'sales to accounting, ZRA-certified e-invoicing', dir: 'work', star: [196, 52], label: 'ERP ZRA' },
-    recon: { name: 'AI-Recon', short: 'bank transaction reconciliation', dir: 'work', star: [174, 46], label: 'AI-RECON' },
-    tazama: { name: 'Tazama case management', short: 'tech lead · open-source fraud and AML', dir: 'work', star: [258, 24], label: 'TAZAMA' },
-    mojaloop: { name: 'Mojaloop reporting hub', short: 'open-source payments · 100k+ transactions a day', dir: 'work', star: [276, 32], label: 'MOJALOOP' },
-    'access-sa': { name: 'Access South Africa', short: 'Spring Boot middleware for Oracle FLEXCUBE', dir: 'work', star: [304, 62], label: 'ACCESS SA' },
-    'access-gh': { name: 'Access Ghana', short: 'Oracle FLEXCUBE teller customizations', dir: 'work', star: [311, 75], label: 'ACCESS GHANA' },
-    creddex: { name: 'Creddex', short: 'self-hosted team credential vault', dir: 'after-dark', star: [202, 72], label: 'CREDDEX' },
-    signboard: { name: 'Signboard', short: 'website builder for local businesses', dir: 'after-dark', star: [184, 81], label: 'SIGNBOARD' },
-    chaos8: { name: 'Chaos 8', short: 'multiplayer pool in the browser', dir: 'after-dark', star: [250, 50], label: 'CHAOS 8' }
+    los: { name: 'Loan Origination System', star: [170, 24], label: 'LOS' },
+    lms: { name: 'Loan Management System', star: [190, 32], label: 'LMS' },
+    hrms: { name: 'HRMS', star: [160, 38], label: 'HRMS' },
+    erp: { name: 'ERP System', star: [196, 52], label: 'ERP ZRA' },
+    recon: { name: 'AI-Recon', star: [174, 46], label: 'AI-RECON' },
+    tazama: { name: 'Tazama case management', star: [258, 24], label: 'TAZAMA' },
+    mojaloop: { name: 'Mojaloop reporting hub', star: [276, 32], label: 'MOJALOOP' },
+    'access-sa': { name: 'Access South Africa', star: [304, 62], label: 'ACCESS SA' },
+    'access-gh': { name: 'Access Ghana', star: [311, 75], label: 'ACCESS GHANA' },
+    creddex: { name: 'Creddex', star: [202, 72], label: 'CREDDEX' },
+    signboard: { name: 'Signboard', star: [184, 81], label: 'SIGNBOARD' },
+    chaos8: { name: 'Chaos 8', star: [250, 50], label: 'CHAOS 8' }
   };
 
   const dlgText = $('dlgText');
@@ -310,7 +308,6 @@
     const loop = t => { if (vis && t - last > 32) { last = t; step(); draw(t); } requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
     return {
-      pointAt: id => { lockId = id; lockUntil = performance.now() + 5000; },
       shower: n => { for (let i = 0; i < n; i++) spawn(i * 6); }
     };
   })();
@@ -381,200 +378,25 @@
 
   const yrsMos = (y, m) => { const n = (now.getFullYear() - y) * 12 + now.getMonth() - m + 2, yr = Math.floor(n / 12), mo = n % 12; return [yr && `${yr} yr${yr > 1 ? 's' : ''}`, mo && `${mo} mo${mo > 1 ? 's' : ''}`].filter(Boolean).join(' '); };
   document.querySelectorAll('[data-since]').forEach(el => { const [y, m] = el.dataset.since.split('-').map(Number); el.textContent = yrsMos(y, m); });
-  const tick = () => { $('tmClock').textContent = hhmm(new Date()); };
-  tick(); setInterval(tick, 30000);
 
-  const wins = [...document.querySelectorAll('.wins a')], secs = ['home', 'work', 'skills', 'projects', 'services', 'contact'].map(id => $(id));
-  const spy = () => { let cur = 'home'; secs.forEach(s => { if (s.getBoundingClientRect().top < innerHeight * .4) cur = s.id; }); wins.forEach(a => a.classList.toggle('on', a.dataset.win === cur)); };
+  const wins = [...document.querySelectorAll('.nav a')], secs = ['work', 'skills', 'projects', 'services', 'contact'].map(id => $(id));
+  const spy = () => { let cur = ''; secs.forEach(s => { if (s.getBoundingClientRect().top < innerHeight * .4) cur = s.id; }); wins.forEach(a => a.classList.toggle('on', a.dataset.sec === cur)); };
   addEventListener('scroll', spy, { passive: true }); spy();
-  const tm = document.querySelector('.tmux'), menuBtn = $('menuBtn');
-  const setMenu = v => { tm.classList.toggle('open', v); menuBtn.setAttribute('aria-expanded', String(v)); menuBtn.textContent = v ? 'close ▴' : 'menu ▾'; };
+  const tm = document.querySelector('.topbar'), menuBtn = $('menuBtn');
+  const setMenu = v => { tm.classList.toggle('open', v); menuBtn.setAttribute('aria-expanded', String(v)); menuBtn.textContent = v ? 'Close' : 'Menu'; };
   menuBtn.addEventListener('click', () => setMenu(!tm.classList.contains('open')));
   wins.forEach(a => a.addEventListener('click', () => setMenu(false)));
   addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
-
-  (() => {
-    const out = $('out'), inp = $('cmd'), ps1 = $('ps1'), stMode = $('stMode'), stCwd = $('stCwd'), stCount = $('stCount'), title = $('termTitle'), term = $('term'), toggle = $('termToggle');
-    const txt = el => el ? el.textContent.replace(/\s+/g, ' ').trim() : '';
-    const clean = el => { if (!el) return ''; const c = el.cloneNode(true); c.querySelectorAll('.lab').forEach(x => x.remove()); return txt(c); };
-    const md = (head, meta, sum, pts, outcome, stack) => [`# ${head}`, `@ ${meta}`, sum, ...(pts.length ? ['', ...pts.map(p => `- ${p}`)] : []), ...(outcome ? ['', `outcome  ${outcome}`] : []), '', `stack  ${stack}`].join('\n');
-    const cardMd = el => md(txt(el.querySelector('h3, h4')), txt(el.querySelector('.e-meta')), clean(el.querySelector('.e-sum, p')), [...el.querySelectorAll('.e-pts li')].map(txt), clean(el.querySelector('.e-out')), [...el.querySelectorAll('.tags span')].map(txt).join(' · '));
-    const dirOf = d => Object.fromEntries(Object.keys(PROJ).filter(id => PROJ[id].dir === d && $('p-' + id)).map(id => [`${id}.md`, cardMd($('p-' + id))]));
-    const SKILLS = [...document.querySelectorAll('.srow')].map(r => [r.dataset.k, [...r.querySelectorAll('.chip')].map(c => (c.classList.contains('core') ? '★ ' : '') + txt(c))]);
-    const JOBS = [
-      { role: 'Software Developer', co: 'Rolaface Softwares', when: 'Jul 2023 – present', ids: ['los', 'tazama', 'erp', 'lms', 'hrms', 'recon', 'mojaloop'] },
-      { role: 'Backend Developer', co: 'Kaveosoft Innovations', when: 'Jun 2021 – Jul 2023', ids: ['access-sa', 'access-gh'] }
-    ];
-    const EDU = 'B.Tech, Computer Science and Engineering\nGraphic Era (Deemed to be University), Dehradun\n2019 – 2023 · CGPA 8.44';
-    const FS = {
-      'about.txt': 'Akhilesh Rawat\nFull-stack developer · Dehradun, India\n\n5+ years building lending, payments, ERP, accounting\nand HR software with React, TypeScript, Node.js,\nPython and Java. Technical lead on Tazama and an HRMS,\nplus the DevOps side: Docker, CI/CD, production support.\n\nAfter dark: pixel art, games and the night sky.',
-      'experience.txt': JOBS.map(j => `# ${j.role} @ ${j.co}\n@ ${j.when}\n${j.ids.map(id => '- ' + PROJ[id].name).join('\n')}`).join('\n\n'),
-      'education.txt': EDU,
-      'skills.txt': SKILLS.map(([k, v]) => `${k.padEnd(10)} ${v.join(' · ')}`).join('\n') + '\n\n★ = main stack',
-      'contact.txt': `email     ${EMAIL}\nlinkedin  linkedin.com/in/akhilesh-rawat-asr\ngithub    github.com/Akku-Rawat`,
-      'resume.pdf': null,
-      '.secrets': "nothing to see here.\nok, one thing: try the konami code on this page.",
-      '.zshrc': "alias hire='open resume.pdf'\nexport SKY=starry\nexport COFFEE=probably",
-      work: dirOf('work'),
-      'after-dark': dirOf('after-dark')
-    };
-    const isDir = v => v !== null && typeof v === 'object';
-    const get = segs => { let n = FS; for (const s of segs) { if (!isDir(n) || !Object.prototype.hasOwnProperty.call(n, s)) return undefined; n = n[s]; } return n; };
-    let cwd = [], hist = [], hi = 0, count = 0, queue = [], pumping = false, greeted = false;
-    const resolve = p => { const segs = p.startsWith('~') || p.startsWith('/') ? [] : [...cwd]; p.replace(/^~\/?/, '').replace(/^\/(home\/akku\/?)?/, '').split('/').forEach(s => { if (!s || s === '.') return; if (s === '..') segs.pop(); else segs.push(s); }); return segs; };
-    const pathStr = segs => '~' + (segs.length ? '/' + segs.join('/') : '');
-    const updatePS1 = () => { ps1.innerHTML = ''; ps1.append('akku@observatory:'); const b = document.createElement('b'); b.textContent = pathStr(cwd); ps1.append(b, '$'); stCwd.textContent = pathStr(cwd); title.textContent = `akku@observatory: ${pathStr(cwd)}`; };
-    const node = p => {
-      if (typeof p === 'string') return document.createTextNode(p);
-      if (p.href) { const a = document.createElement('a'); a.textContent = p.t; a.href = p.href; a.className = 'run' + (p.c ? ' ' + p.c : ''); if (!p.href.startsWith('mailto:')) { a.target = '_blank'; a.rel = 'noopener'; } a.addEventListener('click', ev => ev.stopPropagation()); return a; }
-      const e = document.createElement(p.cmd ? 'button' : 'span'); e.textContent = p.t; e.className = (p.c || '') + (p.cmd ? ' run' : ''); if (p.cmd) { e.type = 'button'; e.addEventListener('click', ev => { ev.stopPropagation(); run(p.cmd); }); } return e;
-    };
-    const pump = () => { if (pumping) return; pumping = true; const nextLine = () => { const dEl = queue.shift(); if (!dEl) { pumping = false; return; } out.appendChild(dEl); out.scrollTop = out.scrollHeight; if (reduce) nextLine(); else setTimeout(nextLine, 11); }; nextLine(); };
-    const print = (parts = '', cls = '') => { const dEl = document.createElement('div'); dEl.className = 'ln' + (cls ? ' ' + cls : ''); (Array.isArray(parts) ? parts : [parts]).forEach(p => { if (p !== '' && p != null) dEl.appendChild(node(p)); }); queue.push(dEl); pump(); };
-    const lines = (str, cls) => str.split('\n').forEach(l => print(l, cls));
-    const echoCmd = v => print([{ t: 'akku@observatory', c: 'u' }, { t: ':', c: 'd' }, { t: pathStr(cwd), c: 'path' }, { t: '$ ', c: 'd' }, v]);
-    const walk = (dir, segs, cb) => Object.keys(dir).forEach(k => { const v = dir[k]; if (isDir(v)) walk(v, [...segs, k], cb); else if (typeof v === 'string') cb([...segs, k], v); });
-    const leven = (a, b) => { const m = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]); for (let j = 1; j <= b.length; j++) m[0][j] = j; for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) m[i][j] = Math.min(m[i - 1][j] + 1, m[i][j - 1] + 1, m[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return m[a.length][b.length]; };
-    const link = (k, label, href) => print([{ t: k.padEnd(10), c: 'k' }, { t: label, href }]);
-    const openUrl = (href, label) => { print([{ t: '→ opening ', c: 'd' }, { t: label, href }]); try { window.open(href, '_blank', 'noopener'); } catch (e) { } };
-
-    const CMDS = {
-      help() {
-        const row = (label, cmds) => { const parts = [{ t: label.padEnd(10), c: 'k' }]; cmds.forEach((c, i) => { parts.push({ t: c, cmd: c.startsWith('cd ') ? `${c} && ls` : c }); if (i < cmds.length - 1) parts.push('  '); }); print(parts); };
-        row('about me', ['whoami', 'experience', 'skills', 'education', 'resume', 'contact']);
-        row('explore', ['ls', 'cd work', 'cat about.txt', 'tree', 'grep react', 'open los']);
-        row('extras', ['neofetch', 'point tazama', 'history', 'clear']);
-        print(''); print({ t: 'tab completes · ↑↓ history · ctrl+l clears · ` opens this from anywhere', c: 'd' });
-      },
-      ls(a) {
-        const all = a.some(x => /^-\w*a/.test(x)), target = a.find(x => !x.startsWith('-')), segs = target ? resolve(target) : cwd, n = get(segs);
-        if (n === undefined) return print({ t: `ls: ${target}: no such file or directory`, c: 'err' });
-        if (!isDir(n)) return print(target);
-        const names = Object.keys(n).filter(k => all || !k.startsWith('.')), parts = [];
-        names.forEach((k, i) => { const rel = target ? `${target.replace(/\/$/, '')}/${k}` : k; parts.push(isDir(n[k]) ? { t: k + '/', c: 'dir', cmd: `cd ${rel} && ls` } : k.endsWith('.pdf') ? { t: k, c: 'h', cmd: `open ${rel}` } : { t: k, cmd: `cat ${rel}` }); if (i < names.length - 1) parts.push('   '); });
-        print(parts.length ? parts : { t: '(empty)', c: 'd' });
-      },
-      cd(a) { const t = a[0] || '~', segs = resolve(t), n = get(segs); if (n === undefined) return print({ t: `cd: no such file or directory: ${t}`, c: 'err' }); if (!isDir(n)) return print({ t: `cd: not a directory: ${t}`, c: 'err' }); cwd = segs; updatePS1(); },
-      pwd() { print('/home/akku' + (cwd.length ? '/' + cwd.join('/') : '')); },
-      cat(a) {
-        if (!a.length) return print({ t: 'usage: cat <file>   try: cat about.txt', c: 'd' });
-        a.forEach(f => {
-          const n = get(resolve(f));
-          if (n === undefined) return print({ t: `cat: ${f}: no such file or directory`, c: 'err' });
-          if (isDir(n)) return print([{ t: `cat: ${f}: is a directory. `, c: 'err' }, { t: `ls ${f}`, cmd: `ls ${f}` }]);
-          if (n === null) return print([{ t: 'binary file. try: ', c: 'd' }, { t: 'open resume.pdf', cmd: 'open resume.pdf' }]);
-          n.split('\n').forEach(l => print(l.startsWith('# ') ? { t: l.slice(2), c: 'h' } : l.startsWith('@ ') ? { t: l.slice(2), c: 'd' } : l.startsWith('- ') ? [{ t: '✦ ', c: 'h' }, l.slice(2)] : l));
-        });
-      },
-      tree(a) {
-        const segs = a[0] ? resolve(a[0]) : cwd, n = get(segs);
-        if (!isDir(n)) return print({ t: 'tree: not a directory', c: 'err' });
-        print({ t: pathStr(segs), c: 'path' });
-        let files = 0, dirs = 0;
-        const rec = (dir, pre, base) => { const ks = Object.keys(dir).filter(k => !k.startsWith('.')); ks.forEach((k, i) => { const lastK = i === ks.length - 1, rel = [...base, k].join('/'), sub = isDir(dir[k]); sub ? dirs++ : files++; print([{ t: pre + (lastK ? '└── ' : '├── '), c: 'd' }, sub ? { t: k + '/', c: 'dir', cmd: `cd ~/${rel} && ls` } : k.endsWith('.pdf') ? { t: k, c: 'h', cmd: `open ~/${rel}` } : { t: k, cmd: `cat ~/${rel}` }]); if (sub) rec(dir[k], pre + (lastK ? '    ' : '│   '), [...base, k]); }); };
-        rec(n, '', segs); print({ t: `${dirs} directories, ${files} files`, c: 'd' });
-      },
-      grep(a) {
-        const term = a.filter(x => !x.startsWith('-')).join(' ').replace(/^["']|["']$/g, '').toLowerCase();
-        if (!term) return print({ t: 'usage: grep <word>   try: grep react', c: 'd' });
-        let hits = 0;
-        walk(FS, [], (segs, body) => body.split('\n').forEach(l => { const i = l.toLowerCase().indexOf(term); if (i < 0) return; hits++; const rel = segs.join('/'), cut = /^(# |@ |- )/.test(l) && i >= 2 ? 2 : 0; print([{ t: rel, c: 'path', cmd: `cat ~/${rel}` }, { t: ': ', c: 'd' }, l.slice(cut, i), { t: l.slice(i, i + term.length), c: 'mark' }, l.slice(i + term.length)]); }));
-        print(hits ? { t: `${hits} match${hits === 1 ? '' : 'es'}`, c: 'd' } : { t: `no matches for "${term}"`, c: 'd' });
-      },
-      open(a) {
-        const q = (a[0] || '').toLowerCase().replace(/^.*\//, '').replace(/\.(md|pdf|txt)$/, '');
-        if (!q) return print({ t: 'usage: open <project | resume | linkedin | github>   try: open los', c: 'd' });
-        if (['resume', 'résumé', 'cv'].includes(q)) return openUrl(RESUME, RESUME);
-        if (q === 'linkedin') return openUrl(LINKEDIN, 'linkedin.com/in/akhilesh-rawat-asr');
-        if (q === 'github') return openUrl(GITHUB, 'github.com/Akku-Rawat');
-        const p = PROJ[q];
-        if (!p) return print([{ t: `open: ${a[0]}: no such project. try `, c: 'err' }, { t: 'ls work', cmd: 'ls work' }]);
-        print([{ t: '→ ', c: 'd' }, { t: p.name, c: 'h' }, { t: ` · ${p.short}`, c: 'd' }]); goTo('p-' + q);
-      },
-      echo(a, raw) { print(raw.replace(/^echo\s*/, '').replace(/^["']|["']$/g, '').replace(/\$SKY/g, 'starry').replace(/\$USER/g, 'akku')); },
-      history() { hist.forEach((h, i) => print([{ t: String(i + 1).padStart(4) + '  ', c: 'd' }, { t: h, cmd: h }])); },
-      clear() { out.innerHTML = ''; queue = []; },
-      whoami() { print({ t: 'akhilesh rawat · full-stack developer', c: 'h' }); print('5+ years in lending, payments, ERP, accounting and HR'); print('technical lead and devops experience'); print([{ t: 'more: ', c: 'd' }, { t: 'experience', cmd: 'experience' }, { t: ' · ', c: 'd' }, { t: 'skills', cmd: 'skills' }, { t: ' · ', c: 'd' }, { t: 'resume', cmd: 'resume' }]); },
-      experience() {
-        JOBS.forEach((j, i) => {
-          if (i) print('');
-          print([{ t: j.role, c: 'h' }, ` @ ${j.co}`]);
-          print({ t: j.when, c: 'd' });
-          j.ids.forEach(id => print([{ t: '  ✦ ', c: 'h' }, { t: PROJ[id].name, cmd: `cat ~/work/${id}.md` }, { t: ` · ${PROJ[id].short}`, c: 'd' }]));
-        });
-        print(''); print([{ t: 'education ', c: 'k' }, 'B.Tech CSE, Graphic Era University, 2019–2023, CGPA 8.44']);
-      },
-      education() { lines(EDU); },
-      neofetch() {
-        const logo = ['      *     .      *', '  .      _____      .', "       .'  |  '.", '      /    |    \\    *', '     |_____|_____|', '     |  []   []  |', '  ___|_____[]____|___', '', ''];
-        const info = [[{ t: 'akku', c: 'u' }, { t: '@', c: 'd' }, { t: 'observatory', c: 'u' }], [{ t: '────────────────', c: 'd' }], ...[['name', 'Akhilesh Rawat'], ['role', 'Full-stack developer'], ['also', 'tech lead · devops'], ['exp', '5+ years'], ['focus', 'lending · payments · fraud · ERP'], ['stack', 'React · TS · Node · Python · Java']].map(([k, v]) => [{ t: k.padEnd(8), c: 'k' }, v])];
-        const narrow = out.clientWidth < 600;
-        info.forEach((parts, i) => print(narrow ? parts : [{ t: (logo[i] || '').padEnd(24), c: 'logo' }, ...parts]));
-        print([{ t: narrow ? '' : ' '.repeat(24) }, ...['#EDBE6C', '#7FD1B9', '#9DA3F2', '#EBA3AE', '#E0566E', '#B49AD8'].map(c => ({ t: '██', c: 'sw' + c.slice(1) }))]);
-      },
-      skills() { SKILLS.forEach(([k, v]) => print([{ t: k.padEnd(11), c: 'k' }, v.join(' · ')])); print({ t: '★ = main stack', c: 'd' }); },
-      point(a) { const id = (a[0] || '').toLowerCase(); if (!PROJ[id]) return print({ t: a[0] ? `point: can't find ${a[0]} in the sky. try ls work` : 'usage: point <project>   try: point tazama', c: 'd' }); print({ t: `slewing the telescope to ${PROJ[id].name} ↑`, c: 'h' }); goTo('home'); setTimeout(() => hero.pointAt(id), reduce ? 0 : 500); },
-      hire() { link('email', EMAIL, 'mailto:' + EMAIL); link('linkedin', 'linkedin.com/in/akhilesh-rawat-asr', LINKEDIN); link('github', 'github.com/Akku-Rawat', GITHUB); link('résumé', RESUME, RESUME); },
-      sudo(a) { if (a.join(' ').toLowerCase().includes('hire')) { print({ t: 'permission granted.', c: 'h' }); return CMDS.hire(); } print({ t: 'permission denied. the telescope only answers to akku.', c: 'err' }); },
-      rm() { print({ t: 'rm: the stars are read-only.', c: 'err' }); },
-      vim() { print("opening vim… just kidding. you'd never get out. (it's :q)"); },
-      exit() { close(); }
-    };
-    Object.assign(CMDS, { man: CMDS.help, cls: CMDS.clear, nano: CMDS.vim, emacs: CMDS.vim, contact: CMDS.hire, email: CMDS.hire, mail: CMDS.hire, jobs: CMDS.experience, ll: () => CMDS.ls(['-a']), about: () => CMDS.cat(['about.txt']), resume: () => CMDS.open(['resume']), cv: () => CMDS.open(['resume']), linkedin: () => CMDS.open(['linkedin']), github: () => CMDS.open(['github']) });
-
-    const run = raw => {
-      const v = raw.trim(); if (!v) return;
-      echoCmd(v); hist.push(v); hi = hist.length; count++; stCount.textContent = `${count} cmd${count === 1 ? '' : 's'}`;
-      v.split('&&').map(s => s.trim()).filter(Boolean).forEach(seg => {
-        const [c, ...a] = seg.split(/\s+/), fn = CMDS[c.toLowerCase()];
-        if (fn) return fn(a, seg);
-        const near = Object.keys(CMDS).map(k => [k, leven(c.toLowerCase(), k)]).sort((x, y) => x[1] - y[1])[0];
-        print([{ t: `zsh: command not found: ${c}`, c: 'err' }, ...(near && near[1] <= 2 ? [{ t: '   did you mean ', c: 'd' }, { t: near[0], cmd: near[0] }, { t: '?', c: 'd' }] : [{ t: '   try ', c: 'd' }, { t: 'help', cmd: 'help' }])]);
-      });
-    };
-    const complete = () => {
-      const v = inp.value, m = v.match(/^(.*?)(\S*)$/), before = m[1], tok = m[2], first = !before.trim();
-      let opts;
-      if (first) opts = Object.keys(CMDS).filter(c => c.startsWith(tok));
-      else {
-        const cmd = before.trim().split(/\s+/)[0];
-        if (['open', 'point'].includes(cmd)) opts = Object.keys(PROJ).concat(cmd === 'open' ? ['resume', 'linkedin', 'github'] : []).filter(k => k.startsWith(tok));
-        else { const slash = tok.lastIndexOf('/'), dirPart = slash >= 0 ? tok.slice(0, slash + 1) : '', base = tok.slice(slash + 1), n = get(dirPart ? resolve(dirPart) : cwd); opts = isDir(n) ? Object.keys(n).filter(k => k.startsWith(base) && (base.startsWith('.') || !k.startsWith('.'))).map(k => dirPart + k + (isDir(n[k]) ? '/' : '')) : []; }
-      }
-      if (!opts.length) return;
-      if (opts.length === 1) { inp.value = before + opts[0] + (opts[0].endsWith('/') ? '' : ' '); return; }
-      const pre = opts.reduce((x, y) => { let i = 0; while (i < x.length && x[i] === y[i]) i++; return x.slice(0, i); });
-      if (pre.length > tok.length) inp.value = before + pre;
-      else { echoCmd(v); print({ t: opts.join('   '), c: 'd' }); }
-    };
-    const open = focus => {
-      if (term.hidden) {
-        term.hidden = false; toggle.setAttribute('aria-expanded', 'true'); toggle.textContent = 'Hide the terminal ▾';
-        if (!greeted) { greeted = true; print({ t: `Last login: ${now.toDateString()} ${hhmm(now)} from your browser`, c: 'd' }); run('neofetch'); print([{ t: 'type ', c: 'd' }, { t: 'help', cmd: 'help' }, { t: ', click anything underlined, or try ', c: 'd' }, { t: 'experience', cmd: 'experience' }]); }
-      }
-      if (focus) setTimeout(() => inp.focus({ preventScroll: true }), reduce ? 0 : 450);
-    };
-    const close = () => { term.hidden = true; toggle.setAttribute('aria-expanded', 'false'); toggle.textContent = 'Try the terminal ▸'; toggle.focus({ preventScroll: true }); };
-    toggle.addEventListener('click', () => term.hidden ? open(true) : close());
-    $('form').addEventListener('submit', e => { e.preventDefault(); run(inp.value); inp.value = ''; });
-    inp.addEventListener('keydown', e => {
-      if (e.key === 'Tab' && inp.value) { e.preventDefault(); complete(); }
-      else if (e.key === 'ArrowUp' && hist.length) { e.preventDefault(); hi = Math.max(0, hi - 1); inp.value = hist[hi]; }
-      else if (e.key === 'ArrowDown' && hist.length) { e.preventDefault(); hi = Math.min(hist.length, hi + 1); inp.value = hist[hi] || ''; }
-      else if (e.ctrlKey && e.key.toLowerCase() === 'l') { e.preventDefault(); CMDS.clear(); }
-      else if (e.ctrlKey && e.key.toLowerCase() === 'c' && !String(window.getSelection())) { e.preventDefault(); echoCmd(inp.value + '^C'); inp.value = ''; }
-    });
-    inp.addEventListener('focus', () => { stMode.textContent = 'INSERT'; stMode.classList.add('ins'); });
-    inp.addEventListener('blur', () => { stMode.textContent = 'NORMAL'; stMode.classList.remove('ins'); });
-    out.addEventListener('click', e => { if (!e.target.closest('button, a') && !String(window.getSelection())) inp.focus({ preventScroll: true }); });
-    document.querySelectorAll('.runs [data-cmd]').forEach(btn => btn.addEventListener('click', () => { run(btn.dataset.cmd); inp.focus({ preventScroll: true }); }));
-    addEventListener('keydown', e => {
-      if (e.key !== '`' || e.ctrlKey || e.metaKey || e.altKey) return;
-      const t = e.target; if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-      e.preventDefault(); open(false); $('console').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); setTimeout(() => inp.focus({ preventScroll: true }), reduce ? 0 : 500);
-    });
-    updatePS1();
-  })();
+  const root = document.documentElement, themeBtn = $('themeBtn'), sysLight = matchMedia('(prefers-color-scheme: light)');
+  const applyTheme = t => {
+    root.dataset.theme = t;
+    document.querySelectorAll('meta[name="theme-color"]').forEach(m => { m.content = t === 'light' ? '#F6F1E6' : '#14131E'; });
+    themeBtn.setAttribute('aria-label', t === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
+  };
+  const saved = () => { try { return localStorage.getItem('theme'); } catch (e) { return null; } };
+  applyTheme(root.dataset.theme === 'light' ? 'light' : 'dark');
+  themeBtn.addEventListener('click', () => { const t = root.dataset.theme === 'light' ? 'dark' : 'light'; applyTheme(t); try { localStorage.setItem('theme', t); } catch (e) { } });
+  sysLight.addEventListener('change', e => { if (!saved()) applyTheme(e.matches ? 'light' : 'dark'); });
 
   const KON = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
   let kpos = 0;

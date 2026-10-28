@@ -1,6 +1,6 @@
 # akku-rawat.github.io
 
-My portfolio: a small pixel observatory under a Starry Night sky, with my work, skills and side projects, a "Work with me" section for freelance clients, a résumé download and a terminal you can type into.
+My portfolio: a small pixel observatory under a Starry Night sky, with my work, skills and side projects, a "Work with me" section for freelance clients, a résumé download, and light and dark themes.
 
 Live at **https://akku-rawat.github.io**
 
@@ -10,7 +10,7 @@ Live at **https://akku-rawat.github.io**
 | --- | --- |
 | `index.html` | The page |
 | `assets/css/style.css` | Styles |
-| `assets/js/main.js` | The sky, pool table, mobile menu and the shell |
+| `assets/js/main.js` | The sky, pool table, mobile menu and theme toggle |
 | `Akhilesh_Rawat_Resume.pdf` | The résumé the site links to |
 | `404.html` | Page for links that go nowhere |
 | `favicon.svg`, `favicon.png`, `apple-touch-icon.png` | Icons |
@@ -31,5 +31,5 @@ Then open http://localhost:4000.
 ## Keeping it fresh
 
 - **Résumé:** replace `Akhilesh_Rawat_Resume.pdf` with the new file, keeping the name.
-- **Work:** the three case studies are `<article class="entry">` cards and the rest are `<li class="proj">` rows in `index.html`. The terminal builds its files from them, so editing one updates `cat work/<project>.md` too.
+- **Work:** the three case studies are `<article class="entry">` cards and the rest are `<li class="proj">` rows in `index.html`.
 - **Services and availability:** the `#services` section in `index.html`.

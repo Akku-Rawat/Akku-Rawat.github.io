@@ -6,8 +6,10 @@
 <title>Akhilesh Rawat · Full-stack developer</title>
 <meta name="description" content="Full-stack developer with 5+ years building lending, payments, ERP, accounting and HR software with React, TypeScript, Node.js, Python and Java. Technical lead and DevOps experience. Available for freelance and remote work.">
 <meta name="author" content="Akhilesh Rawat">
-<meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#14131E">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#14131E" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F6F1E6" media="(prefers-color-scheme: light)">
+<script>(function(){var t;try{t=localStorage.getItem("theme")}catch(e){}if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;var c=t==="light"?"#F6F1E6":"#14131E";document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){m.content=c});})();</script>
 <link rel="canonical" href="https://akku-rawat.github.io/">
 <link rel="icon" href="favicon.png" sizes="48x48">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -25,24 +27,27 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "Akhilesh Rawat", "jobTitle": "Full-stack developer", "description": "Full-stack developer with 5+ years building lending, payments, ERP, accounting and HR software, with technical lead and DevOps experience.", "url": "https://akku-rawat.github.io/", "email": "mailto:akhileshrawat.asr@gmail.com", "address": {"@type": "PostalAddress", "addressLocality": "Dehradun", "addressCountry": "IN"}, "worksFor": {"@type": "Organization", "name": "Rolaface Softwares"}, "alumniOf": {"@type": "CollegeOrUniversity", "name": "Graphic Era University"}, "knowsAbout": ["React", "TypeScript", "Node.js", "Python", "Java", "Docker", "CI/CD", "Loan origination", "Fintech", "ERP", "Accounting", "ZRA Smart Invoice"], "sameAs": ["https://www.linkedin.com/in/akhilesh-rawat-asr", "https://github.com/Akku-Rawat"]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="assets/css/style.css">
 <script src="assets/js/main.js" defer></script>
 </head>
 <body>
-<header class="tmux" aria-label="Main">
-  <a class="sess" href="#home">[akku]</a>
-  <button type="button" class="menu" id="menuBtn" aria-expanded="false" aria-controls="wins">menu ▾</button>
-  <nav class="wins" id="wins" aria-label="Sections"><a href="#home" data-win="home">0:home</a><a href="#work" data-win="work">1:work</a><a href="#skills" data-win="skills">2:skills</a><a href="#projects" data-win="projects">3:projects</a><a href="#services" data-win="services">4:services</a><a href="#contact" data-win="contact">5:contact</a></nav>
-  <div class="tm-right"><span class="opt kh">` terminal</span><span class="opt" id="tmClock"></span><a class="cvbtn" href="Akhilesh_Rawat_Resume.pdf" target="_blank" rel="noopener">résumé.pdf</a></div>
+<header class="topbar" aria-label="Main">
+  <a class="brand" href="#home" aria-label="Akhilesh Rawat, back to top"><span class="b-full">Akhilesh Rawat</span><span class="b-short" aria-hidden="true">AR</span></a>
+  <nav class="nav" id="nav" aria-label="Sections"><a href="#work" data-sec="work">Work</a><a href="#skills" data-sec="skills">Skills</a><a href="#projects" data-sec="projects">Projects</a><a href="#services" data-sec="services">Services</a><a href="#contact" data-sec="contact">Contact</a></nav>
+  <div class="bar-right">
+    <button type="button" class="menu" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
+    <button type="button" class="theme-btn" id="themeBtn" aria-label="Switch colour theme"><svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg><svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg></button>
+    <a class="cvbtn" href="Akhilesh_Rawat_Resume.pdf" target="_blank" rel="noopener">Résumé</a>
+  </div>
 </header>
 
 <section class="hero" id="home" aria-label="Akhilesh's observatory">
   <canvas class="pix hero-cv" id="heroCv" role="img" aria-label="Pixel art of a small observatory on a hill under a swirling, Van Gogh style starry sky with a tall cypress and a village church. Each of Akhilesh's projects is a star; hover one to see its name and click it to jump to the project. Someone sits on a bench with a laptop next to a ginger cat."></canvas>
   <div class="hero-over"><div class="hero-in">
-    <div class="prompt"><span class="u">akku@observatory</span><span class="d">:~$</span> <span class="c">./start</span></div>
     <h1>Akhilesh Rawat</h1>
-    <p class="sub"><b>Full-stack developer</b> Fintech by day, games and stars by night.</p>
+    <p class="sub">Full-stack developer for lending, payments and ERP</p>
+    <p class="sub2">Fintech by day, games and stars by night.</p>
   </div></div>
 </section>
 
@@ -52,12 +57,12 @@
       <canvas class="pix portrait" id="portrait" aria-hidden="true"></canvas>
       <div>
         <div class="speaker">AKHILESH</div>
-        <p class="dlg-text" id="dlgText">Hey, I'm Akhilesh, a full-stack developer. For 5+ years I've built lending, payments, ERP, accounting and HR software, from the database to the UI. I've also led teams as a technical lead and run the DevOps side: Docker, CI/CD and production support. Hiring, or need something built?</p>
+        <p class="dlg-text" id="dlgText">Hey, I'm Akhilesh. I build lending, payments, ERP, accounting and HR software end to end, and I've led teams as a technical lead and run their DevOps.</p>
         <div class="stats">
-          <div><b>5+ yrs</b><span>fintech, lending, HR and ERP</span></div>
-          <div><b>60+</b><span>REST APIs for a loan origination system</span></div>
-          <div><b>100k+</b><span>transactions a day through Mojaloop reporting</span></div>
-          <div><b>ZRA</b><span>certified e-invoicing integration</span></div>
+          <div><b>5+ yrs</b><span>in fintech &amp; ERP</span></div>
+          <div><b>60+</b><span>REST APIs shipped</span></div>
+          <div><b>100k+</b><span>transactions a day</span></div>
+          <div><b>Certified</b><span>ZRA e-invoicing</span></div>
         </div>
         <div class="choices">
           <a class="pri" href="Akhilesh_Rawat_Resume.pdf" target="_blank" rel="noopener">Grab the résumé (PDF)</a>
@@ -69,7 +74,7 @@
   </div>
 
   <section id="work" aria-labelledby="work-h">
-    <div class="sec-head"><div><div class="prompt"><span class="u">akku@observatory</span><span class="d">:~$</span> <span class="c">ls ~/work</span></div><h2 id="work-h">Selected work</h2></div><p>Three projects in depth, then the rest in brief.</p></div>
+    <div class="sec-head"><div><h2 id="work-h">Selected work</h2></div><p>Three projects in depth, then the rest in brief.</p></div>
     <ol class="jobs">
       <li><canvas class="pix" data-ico="job-now" aria-hidden="true"></canvas><div><b>Software Developer</b><span class="at">@ Rolaface Softwares</span><span class="jm">Jul 2023 – present · <span data-since="2023-07">3 yrs</span></span></div></li>
       <li><canvas class="pix" data-ico="job-past" aria-hidden="true"></canvas><div><b>Backend Developer</b><span class="at">@ Kaveosoft Innovations</span><span class="jm">Jun 2021 – Jul 2023 · banking APIs, 99.9% uptime</span></div></li>
@@ -110,7 +115,7 @@
   </section>
 
   <section id="skills" aria-labelledby="skills-h">
-    <div class="sec-head"><div><div class="prompt"><span class="u">akku@observatory</span><span class="d">:~$</span> <span class="c">skills</span></div><h2 id="skills-h">Skills</h2></div><p>The tools I use most and can go deep on. ★ marks my main stack.</p></div>
+    <div class="sec-head"><div><h2 id="skills-h">Skills</h2></div><p>The tools I use most and can go deep on. ★ marks my main stack.</p></div>
     <div class="sheet">
       <div class="srow" data-k="languages"><div class="slab"><canvas class="pix" data-ico="sk-lang" aria-hidden="true"></canvas><h3>Languages</h3></div><div class="chips"><span class="chip core">TypeScript</span><span class="chip">JavaScript</span><span class="chip core">Python</span><span class="chip core">Java</span><span class="chip">SQL</span></div></div>
       <div class="srow" data-k="frontend"><div class="slab"><canvas class="pix" data-ico="sk-front" aria-hidden="true"></canvas><h3>Frontend</h3></div><div class="chips"><span class="chip core">React</span><span class="chip">Next.js</span><span class="chip">TanStack Query</span><span class="chip">Tailwind CSS</span></div></div>
@@ -120,7 +125,7 @@
   </section>
 
   <section id="projects" aria-labelledby="proj-h">
-    <div class="sec-head"><div><div class="prompt"><span class="u">akku@observatory</span><span class="d">:~$</span> <span class="c">ls ~/after-dark</span></div><h2 id="proj-h">Side projects</h2></div><p>What I build after hours, including a pool game you can play right here.</p></div>
+    <div class="sec-head"><div><h2 id="proj-h">Side projects</h2></div><p>What I build after hours, including a pool game you can play right here.</p></div>
     <div class="shop">
       <article class="entry" id="p-creddex" style="--tint:#5FB8A8">
         <div class="e-head"><canvas class="pix ico" data-ico="creddex" aria-hidden="true"></canvas><div><div class="e-meta">2026 · security tool</div><h3>Creddex</h3></div></div>
@@ -143,22 +148,9 @@
     </div>
   </section>
 
-  <section id="console" aria-labelledby="console-h">
-    <div class="term-cta">
-      <div><div class="prompt"><span class="u">akku@observatory</span><span class="d">:~$</span> <span class="c">./talk</span></div><h2 id="console-h">Prefer a terminal?</h2><p>Everything above, as a tiny shell you can type into. Press <span class="kbd">`</span> anytime.</p></div>
-      <button type="button" class="btn ghost" id="termToggle" aria-expanded="false" aria-controls="term">Try the terminal ▸</button>
-    </div>
-    <div class="term" id="term" hidden>
-      <div class="term-bar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="term-title" id="termTitle">akku@observatory: ~</span><span class="term-size">zsh</span></div>
-      <div class="runs" aria-label="Quick commands"><button type="button" data-cmd="whoami">whoami</button><button type="button" data-cmd="experience">experience</button><button type="button" data-cmd="ls work">ls work</button><button type="button" data-cmd="skills">skills</button><button type="button" data-cmd="resume">resume</button><button type="button" data-cmd="help">help</button></div>
-      <div class="term-out" id="out" aria-live="polite"></div>
-      <form class="term-in" id="form"><label for="cmd" id="ps1">akku@observatory:<b>~</b>$</label><input id="cmd" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="try: experience"></form>
-      <div class="term-st"><span class="mode" id="stMode">NORMAL</span><span id="stCwd">~</span><span id="stCount">0 cmds</span><span>tab completes · ↑ history · ctrl+l clears</span></div>
-    </div>
-  </section>
 
   <section id="services" aria-labelledby="svc-h">
-    <div class="sec-head"><div><div class="prompt"><span class="u">akku@observatory</span><span class="d">:~$</span> <span class="c">cat services.md</span></div><h2 id="svc-h">Work with me</h2></div><p class="avail"><i></i>Available for freelance &amp; remote work · IST</p></div>
+    <div class="sec-head"><div><h2 id="svc-h">Work with me</h2></div><p class="avail"><i></i>Available for freelance &amp; remote work · IST</p></div>
     <div class="svc">
       <article><canvas class="pix" data-ico="lending" aria-hidden="true"></canvas><h3>Lending &amp; loan management systems</h3><p>Loan origination and servicing, from application and credit rules to schedules and statements.</p></article>
       <article><canvas class="pix" data-ico="zra" aria-hidden="true"></canvas><h3>ERP + ZRA Smart Invoice integration</h3><p>Sales, stock and accounts on ERPNext, connected to ZRA Smart Invoice. The integration I built passed ZRA certification.</p></article>
@@ -173,10 +165,10 @@
 
   <section class="contact" id="contact" aria-labelledby="contact-h">
     <canvas class="pix mailbox" id="mailbox" aria-hidden="true"></canvas>
-    <div><div class="prompt"><span class="u">akku@observatory</span><span class="d">:~$</span> <span class="c">mail akhilesh</span></div><h2 id="contact-h">Leave a note in the mailbox</h2><p>Hiring for a full-stack role, or need a lending system, ERP integration, web app or website built? Email is the quickest way to reach me.</p><a class="mail" href="mailto:akhileshrawat.asr@gmail.com">akhileshrawat.asr@gmail.com</a></div>
+    <div><h2 id="contact-h">Leave a note in the mailbox</h2><p>Hiring for a full-stack role, or need a lending system, ERP integration, web app or website built? Email is the quickest way to reach me.</p><a class="mail" href="mailto:akhileshrawat.asr@gmail.com">akhileshrawat.asr@gmail.com</a></div>
     <div class="cta"><a class="btn" href="mailto:akhileshrawat.asr@gmail.com">Email me</a><div class="cta-row"><a class="lnk" href="https://www.linkedin.com/in/akhilesh-rawat-asr" target="_blank" rel="noopener">LinkedIn ↗</a><a class="lnk" href="https://github.com/Akku-Rawat" target="_blank" rel="noopener">GitHub ↗</a></div></div>
   </section>
-  <footer><span class="prompt"><span class="u">akku@observatory</span><span class="d">:~$</span> <span class="c">exit</span><span class="cur"></span></span><span>logout · see you under the stars</span></footer>
+  <footer><span>© 2026 Akhilesh Rawat</span><a href="#home">Back to top ↑</a></footer>
 </div>
 </body>
 </html>
