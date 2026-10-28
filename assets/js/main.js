@@ -5,10 +5,7 @@
   const watch = (el, cb) => { if (!('IntersectionObserver' in window)) return cb(true); new IntersectionObserver(es => es.forEach(e => cb(e.isIntersecting)), { rootMargin: '60px' }).observe(el); };
   const BY = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
   const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
-  const lift = (c, a) => c.map(v => Math.min(255, v + a));
   const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
-  const FONT = { A: '010101111101101', B: '110101110101110', C: '011100100100011', D: '110101101101110', E: '111100110100111', F: '111100110100100', G: '011100101101011', H: '101101111101101', I: '111010010010111', J: '001001001101010', K: '101101110101101', L: '100100100100111', M: '101111111101101', N: '110101101101101', O: '010101101101010', P: '110101110100100', Q: '010101101110011', R: '110101110101101', S: '011100010001110', T: '111010010010010', U: '101101101101111', V: '101101101101010', W: '101101111111101', X: '101101010101101', Y: '101101010010010', Z: '111001010100111', 0: '111101101101111', 1: '010110010010111', 2: '110001010100111', 3: '110001010001110', 4: '101101111001001', 5: '111100110001110', 6: '011100111101111', 7: '111001010010010', 8: '111101111101111', 9: '111101111001110', '.': '000000000000010', '-': '000000111000000', '!': '010010010000010', '?': '110001010000010', "'": '010010000000000', ':': '000010000010000' };
-  const FB = {}; Object.keys(FONT).forEach(k => FB[k] = [...FONT[k]].map(Number));
   const PX = ctx => {
     const R = Math.round;
     return {
@@ -16,30 +13,10 @@
       p: (x, y, c) => { ctx.fillStyle = c; ctx.fillRect(R(x), R(y), 1, 1); },
       circ: (cx, cy, rad, c) => { ctx.fillStyle = c; const X = R(cx), Y = R(cy); for (let y = -rad; y <= rad; y++) { const h = Math.floor(Math.sqrt((rad + .5) ** 2 - y * y)); ctx.fillRect(X - h, Y + y, h * 2 + 1, 1); } },
       line: (x0, y0, x1, y1, c, dash = 0) => { const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)) || 1; ctx.fillStyle = c; for (let i = 0; i <= n; i++) { if (dash && i % dash >= dash - 1) continue; ctx.fillRect(R(x0 + (x1 - x0) * i / n), R(y0 + (y1 - y0) * i / n), 1, 1); } },
-      tw: s => String(s).length * 4 - 1,
-      text: (s, x, y, c) => { ctx.fillStyle = c; let cx = R(x); for (const ch of String(s).toUpperCase()) { const b = FB[ch]; if (b) for (let i = 0; i < 15; i++) if (b[i]) ctx.fillRect(cx + i % 3, R(y) + ((i / 3) | 0), 1, 1); cx += 4; } },
-      spr: (rows, pal, x, y) => rows.forEach((row, j) => [...row].forEach((ch, i) => { if (pal[ch]) { ctx.fillStyle = pal[ch]; ctx.fillRect(R(x) + i, R(y) + j, 1, 1); } }))
     };
   };
 
   const now = new Date();
-  const syn = 29.530588853, ref = Date.UTC(2000, 0, 6, 18, 14);
-  const ph = (((now - ref) / 864e5) % syn + syn) % syn / syn;
-
-  const PROJ = {
-    los: { name: 'Loan Origination System', star: [170, 24], label: 'LOS' },
-    lms: { name: 'Loan Management System', star: [190, 32], label: 'LMS' },
-    hrms: { name: 'HRMS', star: [160, 38], label: 'HRMS' },
-    erp: { name: 'ERP System', star: [196, 52], label: 'ERP ZRA' },
-    recon: { name: 'AI-Recon', star: [174, 46], label: 'AI-RECON' },
-    tazama: { name: 'Tazama case management', star: [258, 24], label: 'TAZAMA' },
-    mojaloop: { name: 'Mojaloop reporting hub', star: [276, 32], label: 'MOJALOOP' },
-    'access-sa': { name: 'Access South Africa', star: [304, 62], label: 'ACCESS SA' },
-    'access-gh': { name: 'Access Ghana', star: [311, 75], label: 'ACCESS GHANA' },
-    creddex: { name: 'Creddex', star: [202, 72], label: 'CREDDEX' },
-    signboard: { name: 'Signboard', star: [184, 81], label: 'SIGNBOARD' },
-    chaos8: { name: 'Chaos 8', star: [250, 50], label: 'CHAOS 8' }
-  };
 
   const dlgText = $('dlgText');
   const typing = !reduce && matchMedia('(min-width: 721px)').matches;
@@ -52,33 +29,6 @@
   };
   if (matchMedia('(max-width: 720px)').matches) document.querySelectorAll('details.did').forEach(d => { d.open = false; });
   dlgText.addEventListener('click', () => { clearInterval(typer); dlgText.textContent = dlgFull; });
-  const goTo = id => { const el = $(id); if (!el) return; el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); if (el.matches('.entry, .proj')) { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1800); } };
-
-  const drawPatch = cvs => {
-    cvs.width = 40; cvs.height = 40;
-    const P = PX(cvs.getContext('2d')), hillY = x => Math.round(29 + Math.sin(x * .35) * 1.2);
-    for (let y = 0; y < 40; y++) for (let x = 0; x < 40; x++) {
-      const d = Math.hypot(x + .5 - 20, y + .5 - 20);
-      if (d > 19.6) continue;
-      let col;
-      if (d > 17.6) col = '#EDBE6C';
-      else if (d > 16.4) col = (x + y) % 2 ? '#B8862E' : '#16142C';
-      else if (y >= hillY(x)) col = y === hillY(x) ? '#3A3360' : '#26213F';
-      else col = y < 12 ? '#120F26' : y < 22 ? '#16132D' : '#1B1735';
-      P.p(x, y, col);
-    }
-    for (let t = 0; t < Math.PI * 2.6; t += .18) P.p(20 + Math.cos(t) * (1 + t * 1.2), 20 + Math.sin(t) * (1 + t * 1.2) * .8, '#2C3778');
-    [[9, 18], [16, 7], [24, 8], [32, 25], [33, 13], [7, 24]].forEach(([x, y], i) => P.p(x, y, i % 3 ? '#C9C4DA' : '#EDBE6C'));
-    for (let y = -4; y <= 4; y++) for (let x = -4; x <= 4; x++) if (x * x + y * y <= 18 && (x - 2) ** 2 + (y + 1) ** 2 > 12) P.p(12 + x, 12 + y, '#F1E9D2');
-    const ring = []; for (let a = 0; a < 360; a += 6) { const t = a * Math.PI / 180; ring.push([Math.round(27 + Math.cos(t) * 7), Math.round(18 + Math.sin(t) * 2 - Math.cos(t)), Math.sin(t) > 0]); }
-    ring.filter(q => !q[2]).forEach(([x, y]) => P.p(x, y, '#B8862E'));
-    P.circ(27, 18, 4, '#0E0C18'); P.r(25, 16, 2, 2, '#F1E9D2'); P.p(29, 15, '#4A4370');
-    ring.filter(q => q[2]).forEach(([x, y]) => P.p(x, y, '#EDBE6C'));
-    for (let y = -3; y <= 0; y++) { const h = Math.floor(Math.sqrt(3.5 ** 2 - y * y)); P.r(13 - h, 27 + y, h * 2 + 1, 1, '#C9C2E6'); }
-    P.r(10, 27, 7, 3, '#A9A2D0'); P.p(13, 24, '#120F26'); P.p(13, 25, '#120F26'); P.p(15, 28, '#FFCF6B');
-    [[21, 31], [22, 32], [21, 33]].forEach(([x, y]) => P.p(x, y, '#7FD1B9')); P.r(24, 33, 4, 1, '#7FD1B9');
-  };
-  drawPatch($('portrait'));
 
   const bank = (bg, acc) => [bg, P => { for (let y = 0; y < 4; y++) P.r(10 - y * 2, 3 + y, y * 4 + 1, 1, '#C9C2E6'); P.p(10, 5, acc); P.r(3, 7, 15, 1, '#8D86B0'); [5, 8, 11, 14].forEach(x => P.r(x, 9, 2, 6, '#EFE6D8')); P.r(3, 15, 15, 2, '#8D86B0'); P.r(3, 15, 15, 1, '#C9C2E6'); }];
   const ICONS = {
@@ -119,198 +69,240 @@
     P.p(41, 24, '#E8FF7A'); P.p(6, 22, '#E8FF7A');
   })();
 
-  const hero = (() => {
-    const cv = $('heroCv'), W = 320, H = 150; cv.width = W; cv.height = H;
-    const g = cv.getContext('2d'), G = PX(g), r = rng(77);
-    const skyC = mk(W, H), sctx = skyC.getContext('2d'), S = PX(sctx);
-    const landC = mk(W, H), L = PX(landC.getContext('2d'));
-    const frontC = mk(W, H), F = PX(frontC.getContext('2d'));
-    const back = x => Math.round(110 + Math.sin(x * .03) * 4 + Math.sin(x * .09 + 1) * 2);
-    const front = x => Math.round(128 - 14 * Math.exp(-(((x - 275) / 55) ** 2)) - 3 * Math.exp(-(((x - 110) / 40) ** 2)));
-    const ML = Math.hypot(140, 360), mw = (x, y) => Math.abs((x - 340) * 140 + (y + 20) * 360) / ML;
-    const titleZone = (x, y) => x < 152 && y < 94;
+  const bump = (x, c, w) => Math.exp(-(((x - c) / w) ** 2));
+  const hash = n => { const x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
+  const SPAL = {
+    night: { sky: ['#0A0916', '#0C0D20', '#111129', '#171632', '#1F1C3D', '#2A2550'],
+      r0: '#2C2854', r0Hi: '#3A3566', r1: '#24204A', r1Hi: '#2F2A5A', r2: '#1C1939', r2Hi: '#28234D', r3: '#17152F', r3Hi: '#221E40', ground: '#13112A', groundHi: '#1C1936', near: '#0F0D20', nearHi: '#1C1934',
+      snow: '#9C97C6', snowHi: '#C3BEE6', snowSh: '#6F6AA0', forest: '#0F1622', forestHi: '#18212F',
+      water: '#1A2152', water2: '#212A62', waterDeep: '#11152F', waterHi: '#3D4A94', shore: '#2A2F66', refl: '#F1E9D2', refl2: '#C9C2E6', page: '#14131E',
+      tree: '#0A1216', treeHi: '#14222A', house: '#2A2648', roof: '#3E3966', win: '#FFCF6B', glow1: '#4A2E2C', glow2: '#2B1D27' },
+    morning: { sky: ['#9DBCE2', '#B5CBE7', '#D4DAE4', '#EFE3D4', '#F6D6B4', '#F3C197'],
+      r0: '#DCCDDA', r0Hi: '#E8DAE4', r1: '#C7B4CC', r1Hi: '#D4C2D8', r2: '#AE9BBA', r2Hi: '#BEABC8', r3: '#93819F', r3Hi: '#A592AF', ground: '#7F6E8D', groundHi: '#8F7E9C', near: '#5A4A69', nearHi: '#706083',
+      snow: '#FFF8F0', snowHi: '#FFFFFF', snowSh: '#EADBE3', forest: '#5F7469', forestHi: '#728679',
+      water: '#93BBD6', water2: '#A7CBE1', waterDeep: '#7FA2BF', waterHi: '#D9EBF4', shore: '#B9D3E2', refl: '#FFFFFF', refl2: '#FFF1CF', page: '#F6F1E6', mist: '#F8F0E6',
+      tree: '#3D4D47', treeHi: '#53655C', house: '#EFE6DA', roof: '#7A6A88', win: '#8E7FA0' }
+  };
+  const CH = {
+    night: { hair: '#2A1E24', skin: '#C98E62', skinLit: '#E7AE7C', screenLit: '#A9CDEB', hood: '#5D5396', hoodLit: '#8A7BC4', hoodDark: '#433B78', pants: '#2E2A44', shoe: '#17151F', band: '#3A3550', cup: '#EDBE6C', rock: '#3A3550', rockHi: '#4E4870', lid: '#B7B0D6', screen: '#8FD3FF', notes: ['#7FD1B9', '#EDBE6C'] },
+    morning: { hair: '#2A1E24', skin: '#C98E62', skinLit: '#D9A072', screenLit: '#D9A072', hood: '#5D5396', hoodLit: '#7366AE', hoodDark: '#463E7A', pants: '#3A3554', shoe: '#22202E', band: '#3A3550', cup: '#E9AE45', rock: '#7F7290', rockHi: '#978AA6', lid: '#D6CFE6', screen: '#CFE6F5', notes: ['#2E8A74', '#B07A1F'] }
+  };
+  const SCENE = {
+    d: { w: 320, h: 150, title: [155, 95], stars: 85, horizon: 96, moon: [300, 18, 8], galaxy: [190, 34, .75], planet: [236, 26, .85], halos: [[214, 12], [160, 22], [262, 46]], birds: [[176, 48], [188, 43], [200, 50]],
+      layers: [{ base: 88, peaks: [[180, 24, 16], [214, 36, 15], [246, 30, 18], [60, 4, 30]], a: .7, k: .22, ph: .9, c: 'r0', snow: 68 },
+               { base: 96, peaks: [[150, 10, 22], [230, 14, 24], [290, 20, 20], [50, 5, 30]], a: .8, k: .17, ph: 1.9, c: 'r1', forest: [[150, 320, .5]] },
+               { base: 102, peaks: [[262, 24, 16], [120, 7, 24], [195, 9, 20]], a: .7, k: .14, ph: 2.9, c: 'r2', forest: [[100, 240, .6]] },
+               { base: 108, peaks: [[90, 7, 24], [170, 6, 20]], a: .5, k: .12, ph: .7, c: 'r3', terraces: [70, 120], houses: [84, 96], forest: [[140, 230, .6]] },
+               { base: 112, peaks: [], a: .4, k: .08, ph: 1.5, c: 'ground' }],
+      obs: { x: 262, layer: 2, s: 1 }, river: { y0: 120, amp: 4, k: .025, ph: 1.6, hw: 4.4 },
+      near: x => 129 - 4 * bump(x, 205, 30) + Math.sin(x * .07), fire: 196, cdx: 14, trees: [[280, 20], [292, 36], [306, 46], [318, 32]], mist: [113, 125] },
+    m: { w: 125, h: 140, title: [125, 60], stars: 30, horizon: 98, moon: [20, 70, 5], galaxy: null, planet: [50, 70, .45], halos: [[10, 84], [70, 62]], birds: [[40, 80], [50, 76]],
+      layers: [{ base: 92, peaks: [[70, 24, 12], [98, 20, 12]], a: .5, k: .25, ph: .9, c: 'r0', snow: 78 },
+               { base: 102, peaks: [[30, 6, 14], [110, 10, 12]], a: .5, k: .2, ph: 1.9, c: 'r1', forest: [[40, 125, .5]] },
+               { base: 107, peaks: [[86, 14, 10]], a: .5, k: .2, ph: 2.6, c: 'r2', forest: [[10, 70, .6]] },
+               { base: 112, peaks: [[40, 5, 14]], a: .4, k: .2, ph: .6, c: 'r3', terraces: [20, 56], houses: [34] },
+               { base: 115, peaks: [], a: .3, k: .1, ph: 1, c: 'ground' }],
+      obs: { x: 86, layer: 2, s: .75 }, river: { y0: 121, amp: 1.5, k: .05, ph: 1.3, hw: 3 },
+      near: x => 131 - 3 * bump(x, 62, 16) + .8 * Math.sin(x * .1), fire: 54, cdx: 14, trees: [[100, 14], [111, 24], [122, 30]], mist: [115, 125] }
+  };
+  const ridgeFn = ly => x => ly.base - ly.peaks.reduce((s, [px, h, w]) => s + h * bump(x, px, w), 0) + ly.a * Math.sin(x * ly.k + ly.ph) + .5 * ly.a * Math.sin(x * ly.k * 2.7 + ly.ph * 3);
 
-    const img = sctx.createImageData(W, H), d = img.data;
-    const SK = ['#0A0916', '#0C0D20', '#111129', '#171632', '#1F1C3D', '#292449'].map(hex);
-    const put = (x, y, c) => { const p = (y * W + x) * 4; d[p] = c[0]; d[p + 1] = c[1]; d[p + 2] = c[2]; d[p + 3] = 255; };
+  const drawObs = (P, x, y, s, mode) => {
+    const R = Math.round(7 * s), bw = Math.round(15 * s), bh = Math.round(7 * s), bx = Math.round(x - bw / 2), by = Math.round(y - bh), night = mode === 'night';
+    const wall = night ? '#B7B0D6' : '#D6CFE6', wallSh = night ? '#8D86B5' : '#B3AACC', dome = night ? '#DCD6F0' : '#EEE9F6', domeSh = night ? '#A9A2D0' : '#C6BEDB';
+    P.r(bx, by, bw, bh + 2, wall); P.r(bx + bw - Math.max(2, Math.round(4 * s)), by, Math.max(2, Math.round(4 * s)), bh + 2, wallSh);
+    for (let yy = -R; yy <= 0; yy++) { const h = Math.floor(Math.sqrt((R + .5) ** 2 - yy * yy)); P.r(x - h, by + yy, h * 2 + 1, 1, dome); const sh = Math.ceil(h * .4); P.r(x + h - sh + 1, by + yy, sh, 1, domeSh); }
+    P.r(bx + 1, by - 1, bw - 2, 1, wallSh);
+    P.r(bx + Math.round(3 * s), by + Math.round(3 * s), Math.max(2, Math.round(3 * s)), bh - Math.round(3 * s) + 2, night ? '#3E2F66' : '#7E73A0');
+    P.r(x + Math.round(2 * s), by + Math.round(2 * s), Math.max(2, Math.round(3 * s)), Math.max(2, Math.round(3 * s)), night ? '#FFCF6B' : '#9A93B8');
+    if (night) { P.r(x - 1, by - R, 3, R, '#0E0C1F'); for (let i = 0; i < Math.round(9 * s); i++) P.p(x + Math.round(i * .55), by - R - 1 - i, i < 2 ? '#7FB2C9' : '#C9C2E6'); }
+    else P.r(x, by - R, 1, R, domeSh);
+  };
+  const drawPlanet = (P, cx, cy, s, mode) => {
+    const pts = []; for (let a = 0; a < 360; a += 4) { const t = a * Math.PI / 180; pts.push([Math.round(cx + Math.cos(t) * 11 * s), Math.round(cy + Math.sin(t) * 3 * s - Math.cos(t) * 1.5 * s), Math.sin(t) > 0]); }
+    if (mode === 'morning') { pts.forEach(([x, y], i) => { if (i % 2) P.p(x, y, '#E2D7E2'); }); return; }
+    pts.filter(q => !q[2]).forEach(([x, y]) => P.p(x, y, '#9A7430'));
+    const r = Math.max(2, Math.round(6 * s));
+    P.circ(cx, cy, r, '#141018'); P.circ(cx - Math.round(2 * s), cy - Math.round(2 * s), Math.max(1, Math.round(2 * s)), '#F1E9D2');
+    pts.filter(q => q[2]).forEach(([x, y]) => P.p(x, y, '#EDBE6C'));
+  };
+  const conifer = (P, x, base, h, col, hi) => {
+    for (let i = 0; i < h; i++) { const y = base - h + i, tier = i % 4, w = Math.round(.5 + (i / h) * h * .26 * (.55 + .15 * tier)); P.r(x - w, y, w * 2 + 1, 1, col); if (tier === 3 && w > 0) P.p(x - w, y, hi); }
+    P.r(x, base, 1, 2, '#2A1F1A');
+  };
+
+  const buildScene = (L, mode) => {
+    const W = L.w, H = L.h, c = mk(W, H), g = c.getContext('2d'), P = PX(g), pal = SPAL[mode], night = mode === 'night';
+    const img = g.createImageData(W, H), d = img.data, stops = pal.sky.map(hex), n = stops.length - 1, [mx, my, mr] = L.moon;
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      const t = Math.min(1, y / 116) * (SK.length - 1), i = Math.floor(t), fr = t - i, th = BY[y % 4][x % 4];
-      let c = fr * 16 > th ? SK[Math.min(i + 1, SK.length - 1)] : SK[i];
-      const md = mw(x, y);
-      if (md < 24 && y < 104) { const k = 1 - md / 24; if (k * 16 > th) c = lift(c, 6); if ((k - .45) * 30 > th) c = lift(c, 6); }
-      put(x, y, c);
+      const t = Math.min(1, y / L.horizon) * n, i = Math.floor(t), fr = t - i, th = BY[y % 4][x % 4];
+      let col = fr * 16 > th ? stops[Math.min(i + 1, n)] : stops[i];
+      if (!night) { const dd = Math.hypot(x - mx, (y - my) * 1.1), k = 1 - dd / 60; if (k > 0 && k * 14 > th) col = col.map((v, j) => v + ([255, 246, 223][j] - v) * Math.min(.6, k)); }
+      const p = (y * W + x) * 4; d[p] = col[0]; d[p + 1] = col[1]; d[p + 2] = col[2]; d[p + 3] = 255;
     }
-    const dimA = hex('#3B3762'), dimB = hex('#4C4778');
-    for (let k = 0; k < 600; k++) { const x = Math.floor(r() * W), y = Math.floor(r() * 108); if (mw(x, y) > 26 && r() < .55) continue; put(x, y, r() < .5 ? dimA : dimB); }
-    sctx.putImageData(img, 0, 0);
-
-    const BANDS = [
-      { y0: 34, amp: 5, k: .045, ph: 1.2, x0: 152, x1: 320 },
-      { y0: 61, amp: 6, k: .038, ph: 3.1, x0: 152, x1: 320 },
-      { y0: 99, amp: 2.5, k: .05, ph: .4, x0: 0, x1: 320 }
-    ];
-    const bandY = (b, x) => b.y0 + Math.sin(x * b.k + b.ph) * b.amp;
-    BANDS.forEach(b => { for (let x = b.x0; x < b.x1; x++) { const y = bandY(b, x); if (y > back(x) - 3 || titleZone(x, y)) continue; if ((x + Math.floor(y)) % 3 !== 2) S.p(x, y, '#252F68'); if (x % 4 === 0) S.p(x, y + 1, '#1D2656'); } });
-    const SWX = 222, SWY = 64, SPIN = Math.PI * 4.2;
-    for (let arm = 0; arm < 2; arm++) for (let th = 0; th < SPIN; th += .045) { const rr = 1.5 + th * 1.12, a = th + arm * Math.PI; S.p(SWX + Math.cos(a) * rr, SWY + Math.sin(a) * rr * .8, Math.floor(th * 6) % 3 ? '#2A3577' : '#36468F'); }
-    const HALOS = [[206, 12], [268, 9], [292, 46], [270, 70], [156, 100]];
-    HALOS.forEach(([hx, hy]) => { for (let y = -7; y <= 7; y++) for (let x = -7; x <= 7; x++) { const dd = Math.hypot(x, y), th = BY[(hy + y + 32) % 4][(hx + x + 32) % 4]; if (dd > 2.5 && dd < 3.6 && th < 9) S.p(hx + x, hy + y, '#7E6A3E'); else if (dd > 4.6 && dd < 5.7 && th < 4) S.p(hx + x, hy + y, '#4E4430'); } });
-    const MX = 300, MY = 18, MR = 8, wax = ph < .5, tc = Math.cos(2 * Math.PI * ph);
-    for (let y = -15; y <= 15; y++) for (let x = -15; x <= 15; x++) { const dd = Math.hypot(x, y), th = BY[(MY + y + 32) % 4][(MX + x + 32) % 4]; if (dd > 9.5 && dd < 11 && th < 6) S.p(MX + x, MY + y, '#5C4E33'); else if (dd > 12.5 && dd < 14 && th < 3) S.p(MX + x, MY + y, '#463B2B'); }
-    for (let y = -MR; y <= MR; y++) for (let x = -MR; x <= MR; x++) {
-      if (x * x + y * y > MR * MR + MR * .8) continue;
-      const chord = Math.sqrt(Math.max(.01, MR * MR - y * y)), xs = x / chord, lit = wax ? xs > tc : xs < -tc;
-      S.p(MX + x, MY + y, lit ? ((x * 5 + y * 3 + 40) % 11 === 0 ? '#D4CBB2' : '#F1E9D2') : '#272545');
+    g.putImageData(img, 0, 0);
+    if (night && L.galaxy) { const [gx, gy, gs] = L.galaxy; for (let arm = 0; arm < 2; arm++) for (let th = 0; th < Math.PI * 4.2; th += .05) { const rr = (1.5 + th * 1.12) * gs, a = th + arm * Math.PI; P.p(gx + Math.cos(a) * rr, gy + Math.sin(a) * rr * .8, Math.floor(th * 6) % 3 ? '#2A3577' : '#36468F'); } }
+    if (night) L.halos.forEach(([hx, hy]) => { for (let y = -7; y <= 7; y++) for (let x = -7; x <= 7; x++) { const dd = Math.hypot(x, y), th = BY[(hy + y + 32) % 4][(hx + x + 32) % 4]; if (dd > 2.5 && dd < 3.6 && th < 9) P.p(hx + x, hy + y, '#7E6A3E'); else if (dd > 4.6 && dd < 5.7 && th < 4) P.p(hx + x, hy + y, '#4E4430'); } });
+    if (L.planet) drawPlanet(P, L.planet[0], L.planet[1], L.planet[2], mode);
+    for (let y = -mr - 7; y <= mr + 7; y++) for (let x = -mr - 7; x <= mr + 7; x++) {
+      const dd = Math.hypot(x, y), th = BY[(my + y + 32) % 4][(mx + x + 32) % 4];
+      if (night) { if (dd > mr + 1.5 && dd < mr + 3 && th < 6) P.p(mx + x, my + y, '#5C4E33'); else if (dd > mr + 4.5 && dd < mr + 6 && th < 3) P.p(mx + x, my + y, '#463B2B'); }
+      else { if (dd > mr + 1.5 && dd < mr + 3.2 && th < 10) P.p(mx + x, my + y, '#FFE7B0'); else if (dd > mr + 4.5 && dd < mr + 6.2 && th < 5) P.p(mx + x, my + y, '#FCDDB2'); }
     }
-    const [PLX, PLY] = PROJ.chaos8.star;
-    const ringPts = []; for (let a = 0; a < 360; a += 3) { const t = a * Math.PI / 180; ringPts.push([Math.round(PLX + Math.cos(t) * 11), Math.round(PLY + Math.sin(t) * 3 - Math.cos(t) * 1.5), Math.sin(t) > 0]); }
-    ringPts.filter(q => !q[2]).forEach(([x, y]) => S.p(x, y, '#9A7430'));
-    S.circ(PLX, PLY, 6, '#141018'); S.circ(PLX - 2, PLY - 2, 2, '#F1E9D2'); S.p(PLX - 2, PLY - 3, '#141018'); S.p(PLX - 2, PLY - 1, '#141018'); S.p(PLX + 3, PLY - 4, '#3E3858'); S.p(PLX + 4, PLY - 3, '#3E3858');
-    ringPts.filter(q => q[2]).forEach(([x, y]) => S.p(x, y, '#EDBE6C'));
-
-    for (let x = 0; x < W; x++) { const y = back(x); L.r(x, y, 1, H - y, '#1B1731'); }
-    for (let x = 14; x < 134;) {
-      const w = 4 + Math.floor(r() * 4), h = 3 + Math.floor(r() * 4), base = back(x + (w >> 1));
-      L.r(x, base - h, w, h + 3, '#1B1731');
-      if (r() < .35) L.r(x + (w >> 1) - 1, base - h - 2, 2, 2, '#1B1731');
-      for (let yy = base - h + 1; yy < base; yy += 2) for (let xx = x + 1; xx < x + w - 1; xx += 2) if (r() < .4) L.p(xx, yy, r() < .15 ? '#7FD1B9' : '#E9B865');
-      x += w + 1 + Math.floor(r() * 4);
-    }
-    const cb = back(120);
-    L.r(117, cb - 9, 7, 11, '#1B1731');
-    for (let i = 0; i < 16; i++) { const w = i < 5 ? 3 : 1; L.r(120 - (w >> 1), cb - 10 - i, w, 1, '#1B1731'); }
-    L.p(120, cb - 27, '#1B1731'); L.r(119, cb - 25, 3, 1, '#1B1731'); L.r(120, cb - 6, 1, 2, '#E9B865');
-    for (let x = 0; x < W; x++) { const y = front(x); L.r(x, y, 1, H - y, '#15122A'); L.p(x, y, '#252240'); if (r() < .18) L.p(x, y - 1, '#252240'); }
-    for (let y = 140; y < H; y++) for (let x = 0; x < W; x++) if (BY[y % 4][x % 4] < (y - 139) * 1.6) L.p(x, y, '#100E1F');
-    for (let y = 40; y < H; y++) {
-      const h = (y - 40) / (H - 40), w = .6 + 7.6 * Math.pow(h, .62) + Math.sin(y * .45) * .9, cx = 16 + Math.sin(y * .07) * 1.5 + (1 - h) * 1.5;
-      for (let x = Math.round(cx - w); x <= Math.round(cx + w); x++) { const s = (x - cx + Math.sin(y * .3) * 2.2 + 30) % 3; L.p(x, y, s < 1 ? '#1A2C26' : BY[y % 4][(x + 8) % 4] < 2 ? '#24392F' : '#0F1A17'); }
-    }
-    const pine = (x, h) => { const base = front(x) + 1; for (let i = 0; i < h; i++) { const w = Math.floor(i * .45); L.r(x - w, base - h + i, w * 2 + 1, 1, i % 4 === 3 ? '#16222A' : '#1C2A33'); } L.r(x, base, 1, 2, '#2A1F1A'); };
-    pine(178, 15); pine(188, 10); pine(312, 13);
-    for (let y = 112; y < 126; y++) for (let x = 262; x < 306; x++) { if (y < front(x)) continue; const dd = Math.hypot(x - 284, (y - 116) * 2.4); if (dd < 22 && BY[y % 4][x % 4] < (1 - dd / 22) * 12) L.p(x, y, '#2A2236'); }
-    L.r(270, 96, 29, 19, '#B7B0D6'); L.r(292, 96, 7, 19, '#8D86B5'); L.r(270, 96, 29, 1, '#D4CEEC');
-    L.r(274, 105, 6, 10, '#3E2F66'); L.r(274, 105, 6, 1, '#2A2050'); L.p(278, 110, '#EDBE6C'); L.p(277, 103, '#FFE6A8'); L.p(276, 103, '#C98A3B');
-    L.r(286, 100, 6, 6, '#FFCF6B'); L.r(288, 100, 1, 6, '#C98A3B'); L.r(286, 102, 6, 1, '#C98A3B');
-    for (let y = -14; y <= 0; y++) { const h = Math.floor(Math.sqrt(14.5 ** 2 - y * y)), sh = Math.ceil(h * .4); L.r(284 - h, 96 + y, h * 2 + 1, 1, '#DCD6F0'); L.r(284 + h - sh + 1, 96 + y, sh, 1, '#A9A2D0'); }
-    L.r(271, 95, 27, 1, '#8D86B5');
-    L.r(282, 82, 5, 14, '#0E0C1F');
-    L.r(214, 96, 1, front(214) - 96 + 1, '#5E3F2E'); L.p(214, 95, '#7A5440');
-    const bulbs = [];
-    for (let i = 0; i <= 56; i++) { const t = i / 56, x = 214 + 57 * t, y = 97 - 3 * t + Math.sin(Math.PI * t) * 6; L.p(x, y, '#3A2E3A'); if (i % 5 === 2) bulbs.push({ x: Math.round(x), y: Math.round(y) + 1, c: ['#EDBE6C', '#EBA3AE', '#7FD1B9'][bulbs.length % 3], ph: r() * 6.28 }); }
-    L.r(202, 113, 2, front(202) - 113 + 1, '#5E3F2E');
-    L.r(198, 108, 9, 6, '#5D5396'); L.r(198, 108, 9, 1, '#7C74B8'); L.r(198, 113, 9, 1, '#3E3770'); L.r(199, 110, 1, 2, '#2A2550');
-    L.r(207, 106, 1, 5, '#8D86B0'); L.r(208, 106, 3, 2, '#E0566E');
-    F.r(227, 113, 25, 2, '#6B4A36'); F.r(227, 113, 25, 1, '#8A6A4A');
-    F.r(228, 108, 23, 1, '#7A5440'); F.r(228, 111, 23, 1, '#6B4A36');
-    F.r(229, 107, 2, 8, '#5E3F2E'); F.r(248, 107, 2, 8, '#5E3F2E');
-    F.r(229, 115, 2, front(230) - 115 + 1, '#4A3226'); F.r(248, 115, 2, front(249) - 115 + 1, '#4A3226');
-
-    const HUMAN = ['...tttt...', '..tttttt..', '.tttTtttt.', '.ttttTttt.', '.tttttttt.', '..tttttt..', '.tttttttt.', 'tttttttttt', 'ttTttttTtt', 'tttttttttt', 'tttttttttt', '.tttttttt.'];
-    const HPAL = { t: '#B9853A', T: '#8E6428' };
-    const CAT = ['.o...o.', '.oo.oo.', '.ooooo.', '.eoooe.', '..ono..', '.ooooo.', 'ooooooo', 'ooooooo', 'ooooooo', 'ooooooo'];
-    const glowPts = []; for (let y = 103; y <= 112; y++) for (let x = 230; x <= 245; x++) { if (x > 232 && x < 244) continue; if (BY[y % 4][x % 4] < 7) glowPts.push([x, y]); }
-    const tw = []; while (tw.length < 90) { const x = Math.floor(r() * W), y = Math.floor(r() * 104); if (y > back(x) - 4) continue; if (Math.hypot(x - MX, y - MY) < MR + 6 || Math.hypot(x - PLX, y - PLY) < 13 || HALOS.some(([hx, hy]) => Math.hypot(x - hx, y - hy) < 7) || (x < 26 && y > 38)) continue; const tz = titleZone(x, y); tw.push({ x, y, sp: .5 + r(), ph: r() * 6.28, big: !tz && r() < .2, c: tz ? '#7F79AE' : ['#FFFFFF', '#FFE9A8', '#C9D4FF', '#E6E1F4'][Math.floor(r() * 4)], d: tz ? '#3B3762' : '#4C4778' }); }
-    const CONS = [
-      { name: 'LEDGER', at: [158, 58], ids: ['los', 'lms', 'hrms', 'erp', 'recon'], seg: [[160, 38, 170, 24], [170, 24, 190, 32], [190, 32, 196, 52], [196, 52, 174, 46], [174, 46, 160, 38]], extra: [] },
-      { name: 'COMMONS', at: [236, 30], ids: ['tazama', 'mojaloop'], seg: [[258, 24, 276, 32]], extra: [] },
-      { name: 'FLEXCUBE', at: [286, 54], ids: ['access-sa', 'access-gh'], seg: [[304, 62, 311, 75]], extra: [] },
-      { name: 'CUE', at: [212, 16], ids: ['chaos8'], seg: [[222, 26, 234, 36], [234, 36, 243, 44]], extra: [[222, 26], [234, 36]] },
-      { name: 'WORKBENCH', at: [158, 87], ids: ['signboard', 'creddex'], seg: [[168, 76, 184, 81], [184, 81, 202, 72]], extra: [[168, 76]] }
-    ];
-    const flies = Array.from({ length: 10 }, () => ({ x: 30 + r() * 285, y: 120 + r() * 18, ph: r() * 6.28 }));
-    const LBL = { mail: 'SAY HI', cat: 'PET THE CAT', me: "THAT'S ME", obs: 'TELESCOPE' };
-    const PIV = [284, 88];
-    let ang = -1.3, hover = null, pointer = null, lockId = null, lockUntil = 0, catUntil = 0, shoots = [], vis = false, last = 0;
-
-    const hit = (x, y) => {
-      for (const id of Object.keys(PROJ)) { const [sx, sy] = PROJ[id].star; const big = id === 'chaos8'; if (Math.hypot(x - sx - (big ? 0 : .5), y - sy - (big ? 0 : .5)) < (big ? 11 : 6)) return id; }
-      if (x >= 196 && x <= 212 && y >= 104 && y <= 127) return 'mail';
-      if (x >= 243 && x <= 253 && y >= 101 && y <= 114) return 'cat';
-      if (x >= 232 && x <= 243 && y >= 99 && y <= 114) return 'me';
-      if (x >= 268 && x <= 300 && y >= 80 && y <= 116) return 'obs';
-      return null;
-    };
-    const spawn = (delay = 0) => { const x = 200 + Math.random() * 118, y = 3 + Math.random() * 30; shoots.push({ x, y, life: Math.max(8, (x - 158) / 2.3), wait: delay }); };
-    const ringAround = (cx, cy, rad, col) => { for (let a = 0; a < 12; a++) { const t = a / 12 * Math.PI * 2; G.p(cx + Math.cos(t) * rad, cy + Math.sin(t) * rad, col); } };
-    const plate = (txt, x, y) => { const w = G.tw(txt), px = Math.max(2, Math.min(W - w - 3, x)), py = Math.max(2, Math.min(H - 9, y)); G.r(px - 2, py - 2, w + 4, 9, '#0B0A16'); G.r(px - 2, py + 6, w + 4, 1, '#EDBE6C'); G.text(txt, px, py, '#FFE9A8'); };
-    const loc = e => { const b = cv.getBoundingClientRect(); return [(e.clientX - b.left) / b.width * W, (e.clientY - b.top) / b.height * H]; };
-
-    const draw = t => {
-      const T = reduce ? 0 : t, nowMs = performance.now(), pulse = reduce ? 1 : Math.round(Math.sin(T * .008) + 1);
-      g.drawImage(skyC, 0, 0);
-      if (!reduce) {
-        const off = (T * .012) % 24;
-        BANDS.forEach(b => { for (let x = b.x0 + off; x < b.x1; x += 24) for (let k = 0; k < 4; k++) { const xx = x + k, y = bandY(b, xx); if (y < back(xx) - 3 && !titleZone(xx, y)) G.p(xx, y, '#4A5DB0'); } });
-        const th0 = (T * .0016) % SPIN;
-        for (let arm = 0; arm < 2; arm++) for (let k = 0; k < 8; k++) { const th = (th0 + k * .06) % SPIN, rr = 1.5 + th * 1.12, a = th + arm * Math.PI; G.p(SWX + Math.cos(a) * rr, SWY + Math.sin(a) * rr * .8, '#5266B8'); }
-      }
-      HALOS.forEach(([hx, hy], i) => G.r(hx, hy, 2, 2, Math.sin(T * .0024 + i * 1.7) > -.2 ? '#FFF4C8' : '#E9C46A'));
-      tw.forEach(s => { const v = Math.sin(T * .0021 * s.sp + s.ph); G.p(s.x, s.y, v > .35 ? s.c : s.d); if (s.big && v > .85) { G.p(s.x - 1, s.y, s.d); G.p(s.x + 1, s.y, s.d); G.p(s.x, s.y - 1, s.d); G.p(s.x, s.y + 1, s.d); } });
-      const focus = lockId && nowMs < lockUntil ? lockId : null;
-      CONS.forEach(c => {
-        const hot = c.ids.includes(hover) || c.ids.includes(focus);
-        c.seg.forEach(([a, b, e, f]) => G.line(a, b, e, f, hot ? '#8F88C0' : '#2B2850', 3));
-        if (hot) G.text(c.name, c.at[0], c.at[1], '#C9C2E6');
-        c.extra.forEach(([x, y]) => G.p(x, y, '#9A94C8'));
-      });
-      Object.entries(PROJ).forEach(([id, p]) => {
-        const [x, y] = p.star, on = id === hover || id === focus;
-        if (id === 'chaos8') { if (on) ringAround(PLX, PLY, 14 + pulse, '#FFE9A8'); return; }
-        G.r(x, y, 2, 2, on ? '#FFE9A8' : '#E6E1F4');
-        if (on) ringAround(x + .5, y + .5, 5 + pulse, '#FFE9A8'); else { G.p(x - 1, y, '#5F5A8A'); G.p(x + 2, y + 1, '#5F5A8A'); }
-      });
-      shoots.forEach(s => { if (s.wait > 0) return; G.p(s.x, s.y, '#FFFFFF'); ['#C9D4FF', '#8F88C0', '#5D5396', '#3A3070'].forEach((c, i) => G.p(s.x + (i + 1) * 1.6, s.y - (i + 1) * .8, c)); });
-      g.drawImage(landC, 0, 0);
-      bulbs.forEach(b => G.p(b.x, b.y, Math.sin(T * .0016 + b.ph) > -.5 ? b.c : '#3A2E3A'));
-      let target;
-      if (focus) target = Math.atan2(PROJ[focus].star[1] - PIV[1], PROJ[focus].star[0] - PIV[0]);
-      else if (pointer) target = Math.atan2(pointer[1] - PIV[1], pointer[0] - PIV[0]);
-      else target = -Math.PI / 2 + Math.sin(T * .0004) * .75;
-      if (target > .5) target = -Math.PI + .55;
-      target = Math.max(-2.6, Math.min(-.55, target));
-      ang += (target - ang) * (reduce ? 1 : .14);
-      const dx = Math.cos(ang), dy = Math.sin(ang), nx = -dy, ny = dx;
-      [-1, 0, 1].forEach(k => G.line(PIV[0] + nx * k, PIV[1] + ny * k, PIV[0] + dx * 15 + nx * k, PIV[1] + dy * 15 + ny * k, k < 0 ? '#E0DBF2' : k === 0 ? '#C9C2E6' : '#8D86B0'));
-      for (let k = -2; k <= 2; k++) G.p(PIV[0] + dx * 15 + nx * k, PIV[1] + dy * 15 + ny * k, '#3A3042');
-      G.p(PIV[0] + dx * 16, PIV[1] + dy * 16, '#7FB2C9');
-      const flick = Math.sin(T * .02) > .92;
-      glowPts.forEach(([x, y]) => G.p(x, y, flick ? '#1F403E' : '#264E4B'));
-      G.spr(HUMAN, HPAL, 233, 101);
-      const blink = (T % 3600) < 140;
-      G.spr(CAT, { o: '#D08A4E', e: blink ? '#D08A4E' : '#2A1810', n: '#E7A0A0' }, 244, 103);
-      const tail = Math.round(Math.sin(T * .003) * 1.2);
-      G.p(251, 110, '#D08A4E'); G.p(252, 109 + tail, '#D08A4E'); G.p(252, 108 + tail, '#D08A4E');
-      g.drawImage(frontC, 0, 0);
-      if (nowMs < catUntil) { G.r(239, 92, 21, 9, '#F1E9D2'); G.p(247, 101, '#F1E9D2'); G.p(248, 102, '#F1E9D2'); G.text('MRRP', 242, 94, '#2A2238'); }
-      flies.forEach(f => { const x = f.x + Math.sin(T * .0006 + f.ph) * 10, y = f.y + Math.sin(T * .0011 + f.ph * 2) * 4; if (Math.sin(T * .003 + f.ph) > .1) G.p(x, y, '#E8FF7A'); });
-      if (hover) { if (PROJ[hover]) { const [x, y] = PROJ[hover].star; plate(PROJ[hover].label, x + (hover === 'chaos8' ? 15 : 6), y - 3); } else if (hover === 'mail') plate(LBL.mail, 192, 98); else if (hover === 'cat') plate(LBL.cat, 238, 93); else if (hover === 'me') plate(LBL.me, 222, 93); else if (hover === 'obs') plate(LBL.obs, 262, 72); }
-    };
-    const step = () => {
-      if (reduce) return;
-      shoots.forEach(s => { if (s.wait > 0) { s.wait--; return; } s.x -= 2.3; s.y += 1.15; s.life--; });
-      shoots = shoots.filter(s => s.life > 0);
-      if (Math.random() < .004) spawn();
-    };
-    cv.addEventListener('pointermove', e => { const [x, y] = loc(e); pointer = [x, y]; hover = hit(x, y); cv.style.cursor = hover ? 'pointer' : 'default'; });
-    cv.addEventListener('pointerleave', () => { pointer = null; hover = null; });
-    cv.addEventListener('click', e => {
-      const [x, y] = loc(e), h = hit(x, y);
-      if (!h) return;
-      if (PROJ[h]) { lockId = h; lockUntil = performance.now() + 2500; setTimeout(() => goTo('p-' + h), reduce ? 0 : 450); return; }
-      if (h === 'mail') goTo('contact');
-      else if (h === 'cat') { catUntil = performance.now() + 1600; dialogSay('That ginger furball is the observatory cat. It supervises every deploy.'); }
-      else if (h === 'me') dialogSay("That's me, counting meteors between builds. Laptop open, obviously.");
-      else if (h === 'obs') dialogSay('The telescope follows your cursor. The labelled stars are my projects; click one and it takes you there.');
+    for (let y = -mr; y <= mr; y++) for (let x = -mr; x <= mr; x++) { const dd = Math.hypot(x, y); if (dd > mr + .4) continue; P.p(mx + x, my + y, night ? ((x * 5 + y * 3 + 40) % 11 === 0 ? '#D4CBB2' : '#F1E9D2') : (dd > mr - 1.2 ? '#FFDF8F' : '#FFF4D1')); }
+    const ridges = L.layers.map(ridgeFn), windows = [];
+    L.layers.forEach((ly, li) => {
+      const f = ridges[li], col = pal[ly.c], hi = pal[ly.c + 'Hi'];
+      for (let x = 0; x < W; x++) { const y = Math.round(f(x)); if (y >= H) continue; P.r(x, y, 1, H - y, col); if ((x + y) % 2 === 0) P.p(x, y, hi); }
+      if (ly.snow) for (let x = 0; x < W; x++) { const top = Math.round(f(x)); if (top >= ly.snow) continue; const depth = Math.round((ly.snow - top) * .7 + 1 + hash(x * 1.7) * 2), slope = f(x + 1) - f(x - 1); for (let y = top; y < top + depth && y < H; y++) { if (y >= top + depth - 1 && hash(x + y) > .5) continue; P.p(x, y, slope > .5 ? pal.snowSh : y === top ? pal.snowHi : pal.snow); } }
+      if (ly.terraces) { const [t0, t1] = ly.terraces; for (let x = t0; x < t1; x++) { const top = f(x); for (let k = 1; k <= 4; k++) { const y = Math.round(top + k * 2.5 + Math.sin(x * .05 + k) * .5); if (y < H && (x + k * 2) % 9 !== 0) P.p(x, y, hi); } } }
+      (ly.forest || []).forEach(([x0, x1, dens]) => { for (let x = x0; x < Math.min(x1, W); x += 2) { if (hash(x * 3.3 + li * 17) > dens) continue; const top = Math.round(f(x)) + 1 + Math.round(hash(x * 5.1 + li) * 3), h = 2 + Math.round(hash(x * 7.9 + li) * (li > 2 ? 3 : 2)); for (let i = 0; i < h; i++) { const w = i > h - 2 ? 1 : 0; P.r(x - w, top - h + i + 1, w * 2 + 1, 1, i === 0 ? pal.forestHi : pal.forest); } } });
+      (ly.houses || []).forEach(hx => { const y = Math.round(f(hx)) + 3; P.r(hx - 2, y - 3, 4, 3, pal.house); P.r(hx - 3, y - 4, 6, 1, pal.roof); P.r(hx - 2, y - 5, 4, 1, pal.roof); windows.push([hx - 1, y - 2]); P.p(hx - 1, y - 2, pal.win); });
+      if (L.obs.layer === li) drawObs(P, L.obs.x, Math.round(f(L.obs.x)) + 1, L.obs.s, mode);
     });
-    draw(0);
-    watch(cv, v => vis = v);
-    const loop = t => { if (vis && t - last > 32) { last = t; step(); draw(t); } requestAnimationFrame(loop); };
-    requestAnimationFrame(loop);
-    return {
-      shower: n => { for (let i = 0; i < n; i++) spawn(i * 6); }
+    const landTop = x => Math.min(...ridges.map(f => f(x)));
+    const mask = new Uint8Array(W * H), R = L.river;
+    for (let x = 0; x < W; x++) { const cy = R.y0 + R.amp * Math.sin(R.k * x + R.ph); for (let y = Math.round(cy - R.hw); y <= Math.round(cy + R.hw); y++) if (y >= 0 && y < H) mask[y * W + x] = 1; }
+    const water = [];
+    for (let x = 0; x < W; x++) {
+      let top = -1;
+      for (let y = 0; y < H; y++) {
+        if (!mask[y * W + x]) continue;
+        if (top < 0) top = y;
+        if (y === top) { P.p(x, y, pal.shore); continue; }
+        const refl = 2 * top - y + 1 >= landTop(x) - 1;
+        P.p(x, y, refl ? pal.waterDeep : ((y + Math.floor(x / 9)) % 3 === 0 ? pal.water2 : pal.water));
+        water.push([x, y, refl]);
+      }
+    }
+    const nearY = x => Math.round(L.near(x));
+    for (let x = 0; x < W; x++) { const y = nearY(x); if (y >= H) continue; P.r(x, y, 1, H - y, pal.near); P.p(x, y, pal.nearHi); if (hash(x * 3.1) < .18) P.p(x, y - 1, pal.nearHi); }
+    L.trees.forEach(([tx, th]) => conifer(P, tx, nearY(tx) + 1, th, pal.tree, pal.treeHi));
+    const fx = L.fire, fy = nearY(fx);
+    [[-5, 0], [5, 0], [-4, 1], [4, 1]].forEach(([dx, dy]) => P.p(fx + dx, fy + dy, night ? '#3A3550' : '#8F84A0'));
+    P.r(fx - 3, fy - 1, 7, 1, '#5E3F2E'); P.r(fx - 4, fy - 2, 3, 1, '#7A5440'); P.r(fx + 2, fy - 2, 3, 1, '#7A5440'); P.p(fx, fy - 2, '#4A3226');
+    for (let y = H - 6; y < H; y++) for (let x = 0; x < W; x++) if (BY[y % 4][x % 4] < (y - (H - 7)) * 2.6) P.p(x, y, pal.page);
+    const treeTop = x => Math.min(999, ...L.trees.filter(([tx, th]) => Math.abs(x - tx) <= th * .3 + 1).map(([tx, th]) => nearY(tx) - th));
+    const obsTop = x => Math.abs(x - L.obs.x) < 10 * L.obs.s ? ridges[L.obs.layer](L.obs.x) - 17 * L.obs.s : 999;
+    const S = { canvas: c, water: water.filter(([x, y]) => y < nearY(x) && !L.trees.some(([tx, th]) => Math.abs(x - tx) <= th * .3 + 1 && y >= nearY(tx) - th)), windows, nearY, fx, fy, stars: [], glow: [] };
+    if (night) {
+      const r = rng(L.stars * 7 + W); let guard = 0;
+      while (S.stars.length < L.stars && guard++ < 5000) {
+        const x = Math.floor(r() * W), y = Math.floor(r() * (L.horizon - 6));
+        if (y > Math.min(landTop(x), treeTop(x), obsTop(x)) - 4 || Math.hypot(x - mx, y - my) < mr + 8) continue;
+        if (L.planet && Math.hypot(x - L.planet[0], y - L.planet[1]) < 14 * L.planet[2]) continue;
+        if (L.halos.some(([hx, hy]) => Math.hypot(x - hx, y - hy) < 7)) continue;
+        const tz = x < L.title[0] && y < L.title[1];
+        S.stars.push({ x, y, sp: .5 + r(), ph: r() * 6.28, big: !tz && r() < .18, c: tz ? '#6E68A0' : ['#FFFFFF', '#FFE9A8', '#C9D4FF', '#E6E1F4'][Math.floor(r() * 4)], d: tz ? '#2E2B55' : '#4C4778' });
+      }
+      for (let dy = -7; dy <= 6; dy++) for (let dx = -18; dx <= 18; dx++) { const x = fx + dx, y = fy + dy; if (x < 0 || x >= W || y < 0 || y >= H || y < nearY(x)) continue; const e = (dx / 18) ** 2 + (dy / 7) ** 2; if (e < 1) S.glow.push([x, y, 1 - e]); }
+    }
+    return S;
+  };
+
+  const drawFigure = (P, cx, by, mode, t, flick) => {
+    const C = CH[mode], night = mode === 'night';
+    P.r(cx - 1, by - 3, 6, 3, C.rock); P.r(cx - 1, by - 3, 6, 1, C.rockHi);
+    P.r(cx - 6, by - 5, 7, 2, C.pants); P.r(cx - 7, by - 5, 2, 5, C.pants); P.r(cx - 9, by - 1, 4, 1, C.shoe);
+    P.r(cx - 1, by - 11, 5, 7, C.hood); P.r(cx + 3, by - 11, 1, 7, C.hoodDark); P.r(cx + 2, by - 12, 2, 2, C.hoodDark);
+    P.r(cx - 1, by - 16, 4, 5, C.skin); P.r(cx - 1, by - 17, 5, 2, C.hair); P.r(cx + 2, by - 16, 2, 4, C.hair); P.p(cx - 1, by - 15, C.hair);
+    P.p(cx, by - 14, '#2A1E24');
+    P.r(cx - 1, by - 18, 5, 1, C.band); P.p(cx - 1, by - 17, C.band); P.r(cx + 1, by - 15, 2, 3, C.cup); P.p(cx + 1, by - 15, '#FFE09A');
+    P.r(cx - 6, by - 6, 5, 1, '#8D86B0');
+    [[-6, -7], [-6, -8], [-7, -9], [-7, -10], [-7, -11]].forEach(([dx, dy]) => P.p(cx + dx, by + dy, C.lid));
+    [[-6, -9], [-6, -10], [-6, -11]].forEach(([dx, dy]) => P.p(cx + dx, by + dy, C.screen));
+    P.r(cx - 4, by - 8, 4, 1, C.hood); P.r(cx - 5, by - 7, 2, 1, C.skin);
+    if (night) {
+      if (flick > .35) { P.r(cx - 1, by - 11, 1, 6, C.hoodLit); P.p(cx - 1, by - 16, C.skinLit); }
+      P.p(cx - 1, by - 13, C.screenLit); P.p(cx - 1, by - 12, C.screenLit); P.p(cx - 5, by - 7, C.screenLit);
+    } else {
+      P.r(cx + 5, by - 3, 2, 3, '#F6EFE4'); P.p(cx + 5, by - 3, '#C98A3B');
+      const ph = (t * .0006) % 1; for (let i = 0; i < 3; i++) { const p = (ph + i / 3) % 1; P.p(cx + 5 + Math.round(Math.sin(p * 6 + i) * .8), by - 5 - Math.round(p * 6), p < .6 ? '#FFFFFF' : '#EDE6DE'); }
+    }
+  };
+
+  const NOTE = [[0, 1, 1], [0, 1, 0], [1, 1, 0], [1, 1, 0]];
+  const drawScene = (L, S, P, g, mode, t) => {
+    const night = mode === 'night', pal = SPAL[mode], W = L.w;
+    g.drawImage(S.canvas, 0, 0);
+    if (night) {
+      S.stars.forEach(s => { const q = Math.sin(t * .0021 * s.sp + s.ph); P.p(s.x, s.y, q > .35 ? s.c : s.d); if (s.big && q > .85) { P.p(s.x - 1, s.y, s.d); P.p(s.x + 1, s.y, s.d); P.p(s.x, s.y - 1, s.d); P.p(s.x, s.y + 1, s.d); } });
+      L.halos.forEach(([hx, hy], i) => P.r(hx, hy, 2, 2, Math.sin(t * .0024 + i * 1.7) > -.2 ? '#FFF4C8' : '#E9C46A'));
+      if (L.galaxy) { const [gx, gy, gs] = L.galaxy, th0 = (t * .0016) % (Math.PI * 4.2); for (let arm = 0; arm < 2; arm++) for (let k = 0; k < 6; k++) { const th = (th0 + k * .06) % (Math.PI * 4.2), rr = (1.5 + th * 1.12) * gs, a = th + arm * Math.PI; P.p(gx + Math.cos(a) * rr, gy + Math.sin(a) * rr * .8, '#5266B8'); } }
+      S.windows.forEach(([x, y], i) => P.p(x, y, Math.sin(t * .0013 + i * 2.3) > -.6 ? '#FFCF6B' : '#C98A3B'));
+    } else {
+      L.birds.forEach(([bx, by], k) => { const span = W * .22, x = Math.round(bx - ((t * .003 + k * 9) % span)), y = by + Math.round(Math.sin(t * .001 + k) * 1.5), up = Math.floor(t / 280 + k) % 2; P.p(x, y, '#4A4560'); if (up) { P.p(x - 1, y - 1, '#4A4560'); P.p(x + 1, y - 1, '#4A4560'); } else { P.p(x - 1, y, '#4A4560'); P.p(x + 1, y, '#4A4560'); } });
+    }
+    const [mx] = L.moon, tt = t * .0022;
+    S.water.forEach(([x, y, refl]) => {
+      if (Math.abs(x - mx) <= 1 + (y % 4 === 0 ? 1 : 0)) { if (BY[y % 4][(x + Math.floor(t / 180)) % 4] < 4) P.p(x, y, night ? (y % 2 ? pal.refl : pal.refl2) : (y % 2 ? '#FFF1CF' : '#FFFFFF')); return; }
+      const s = Math.sin(x * .45 + y * 1.7 - tt);
+      if (s > (night ? .94 : .965)) P.p(x, y, night ? (refl ? pal.shore : pal.waterHi) : pal.refl);
+      else if (night && !refl && hash(x * 7.7 + y * 3.3) > .985 && Math.sin(t * .003 + x) > .3) P.p(x, y, pal.refl2);
+    });
+    if (!night) {
+      const [y0, y1] = L.mist, mid = (y0 + y1) / 2, half = (y1 - y0) / 2, off = Math.floor(t * .004);
+      for (let y = y0; y <= y1; y++) { const fall = 1 - Math.abs(y - mid) / half; for (let x = 0; x < W; x++) { if (y >= S.nearY(x) || L.trees.some(([tx, th]) => Math.abs(x - tx) <= th * .3 + 2)) continue; const dens = fall * (1.4 + 1.8 * Math.sin(x * .05 + t * .0004 + y * .3)); if (BY[y % 4][(x + off) % 4] < dens) P.p(x, y, pal.mist); } }
+    }
+    const fx = S.fx, fy = S.fy, flick = .5 + .5 * Math.sin(t * .021) * Math.sin(t * .013 + 1);
+    if (night) {
+      S.glow.forEach(([x, y, k]) => { if (k * 15 * (.8 + .3 * flick) > BY[y % 4][x % 4] + 4) P.p(x, y, k > .55 ? pal.glow1 : pal.glow2); });
+      const base = [3, 5, 7, 5, 3];
+      for (let i = 0; i < 5; i++) { const h = Math.max(1, Math.round(base[i] * (.7 + .45 * hash(Math.floor(t / 90) * 5 + i)))), x = fx - 2 + i; for (let j = 0; j < h; j++) { const f = j / h; P.p(x, fy - 3 - j, f < .3 && i > 0 && i < 4 ? '#FFE7A8' : f < .6 ? '#FFB347' : f < .85 ? '#E9893A' : '#C8452F'); } }
+      for (let k = 0; k < 6; k++) { const ph = ((t * .00085 + k * .37) % 1.3) / 1.3; if (ph >= 1) continue; P.p(fx + Math.round(Math.sin(k * 2.1 + ph * 6) * 1.5 + (hash(k) - .5) * 4), fy - 9 - Math.round(ph * 16), ph < .4 ? '#FFCF6B' : ph < .75 ? '#E9893A' : '#8A4A3A'); }
+      for (let k = 0; k < 6; k++) { const ph = (t * .00032 + k / 6) % 1; if (ph > .6 && k % 2) continue; P.p(fx + Math.round(Math.sin(ph * 5 + k) * 2 * ph), fy - 11 - Math.round(ph * 20), ph < .5 ? '#5A5578' : '#3E3A5C'); }
+    } else {
+      [[-1, -2], [1, -2], [0, -3], [2, -1]].forEach(([dx, dy], i) => P.p(fx + dx, fy + dy, ['#E9893A', '#C8452F', '#FFB347'][(Math.floor(t / 300) + i) % 3]));
+      for (let i = 0; i < 26; i++) { if (hash(i + 3) < .25 * (i / 26)) continue; P.p(fx + Math.round(Math.sin(i * .32 - t * .0016) * (.4 + i * .07)), fy - 4 - i, i < 12 ? '#A99FA2' : '#C7BEBC'); }
+    }
+    const cx = fx + L.cdx, cby = S.nearY(cx);
+    drawFigure(P, cx, cby, mode, t, flick);
+    const nn = night ? 3 : 2;
+    for (let k = 0; k < nn; k++) {
+      const ph = (t * .00022 + k / nn) % 1; if (ph > .9) continue;
+      const x = Math.round(cx + 2 + ph * 7 * (k % 2 ? -1 : 1) + Math.sin(ph * 7 + k) * 1.5), y = Math.round(cby - 20 - ph * 22), col = CH[mode].notes[k % 2];
+      NOTE.forEach((row, j) => row.forEach((on, i) => { if (on) P.p(x + i, y + j, col); }));
+    }
+  };
+
+  const scene = (() => {
+    const box = $('home'), cvs = { night: $('heroNight'), morning: $('heroMorning') }, phone = matchMedia('(max-width: 720px)');
+    let L, built = {}, mode = document.documentElement.dataset.theme === 'light' ? 'morning' : 'night', bothUntil = 0, vis = true, last = 0;
+    const setup = () => {
+      L = SCENE[phone.matches ? 'm' : 'd']; built = {};
+      Object.entries(cvs).forEach(([m, cv]) => { cv.width = L.w; cv.height = L.h; const g = cv.getContext('2d'); built[m] = { S: buildScene(L, m), g, P: PX(g) }; });
+      paint(reduce ? 2400 : performance.now(), true);
     };
+    const paint = (t, all) => Object.entries(built).forEach(([m, b]) => { if (all || m === mode || t < bothUntil) drawScene(L, b.S, b.P, b.g, m, t); });
+    phone.addEventListener('change', setup);
+    watch(box, v => { vis = v; });
+    setup();
+    const loop = t => { if (!reduce && vis && t - last > 60) { last = t; paint(t, false); } requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+    return { setMode: m => { if (m === mode) return; mode = m; bothUntil = performance.now() + 1200; if (reduce) paint(2400, true); } };
   })();
+
+  const drawBust = (cv, theme) => {
+    cv.width = 24; cv.height = 24;
+    const P = PX(cv.getContext('2d')), night = theme !== 'light', C = CH[night ? 'night' : 'morning'];
+    P.r(0, 0, 24, 24, night ? '#141230' : '#E7DCCB');
+    if (night) { [[3, 4], [19, 3], [21, 9], [2, 12]].forEach(([x, y], i) => P.p(x, y, i % 2 ? '#FFE9A8' : '#C9D4FF')); P.r(0, 20, 24, 4, '#2A1E2A'); }
+    else { P.r(0, 0, 24, 9, '#C9D8EA'); P.r(0, 9, 24, 3, '#E9E0D2'); P.r(0, 18, 24, 6, '#CFBFA8'); }
+    for (let y = 17; y < 24; y++) { const w = Math.min(11, Math.round(6 + (y - 17) * 1.3)); P.r(12 - w, y, w * 2, 1, C.hood); P.r(12 + w - 3, y, 3, 1, C.hoodDark); }
+    P.r(9, 16, 6, 2, C.hoodDark); [[10, 19], [13, 19], [10, 20], [13, 20]].forEach(([x, y]) => P.p(x, y, '#E8E0D0'));
+    P.r(10, 14, 4, 3, '#A9744E');
+    P.r(8, 5, 8, 1, C.skin); P.r(7, 6, 10, 8, C.skin); P.r(8, 14, 8, 1, C.skin); P.r(9, 15, 6, 1, C.skin);
+    P.r(15, 9, 2, 5, '#B47C55'); P.r(14, 14, 2, 1, '#B47C55');
+    P.r(9, 2, 6, 1, C.hair); P.r(7, 3, 10, 1, C.hair); P.r(6, 4, 12, 2, C.hair); P.r(6, 6, 3, 1, C.hair); P.r(15, 6, 3, 1, C.hair); P.p(10, 6, C.hair); P.p(12, 6, C.hair); P.r(6, 7, 1, 4, C.hair); P.r(17, 7, 1, 4, C.hair);
+    P.p(9, 3, '#4A3540'); P.p(8, 4, '#4A3540');
+    P.r(8, 8, 3, 1, C.hair); P.r(13, 8, 3, 1, C.hair);
+    P.r(9, 10, 2, 1, '#1A1420'); P.r(13, 10, 2, 1, '#1A1420');
+    P.p(12, 12, '#A9744E'); P.r(11, 13, 2, 1, '#8E4E42');
+    P.r(8, 1, 8, 1, C.band); P.r(6, 2, 2, 1, C.band); P.r(16, 2, 2, 1, C.band); P.r(5, 3, 1, 4, C.band); P.r(18, 3, 1, 4, C.band);
+    P.r(4, 7, 3, 5, C.cup); P.r(17, 7, 3, 5, C.cup); P.r(6, 8, 1, 3, '#B8862E'); P.r(17, 8, 1, 3, '#B8862E'); P.p(4, 7, '#FFE09A'); P.p(17, 7, '#FFE09A');
+    if (night) { P.r(7, 7, 1, 6, C.skinLit); P.p(8, 13, '#E7AE7C'); }
+  };
+  drawBust($('portrait'), document.documentElement.dataset.theme);
 
   (() => {
     const cv = $('pool'), W = 200, H = 100; cv.width = W; cv.height = H;
@@ -392,15 +384,12 @@
     root.dataset.theme = t;
     document.querySelectorAll('meta[name="theme-color"]').forEach(m => { m.content = t === 'light' ? '#F6F1E6' : '#14131E'; });
     themeBtn.setAttribute('aria-label', t === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
+    scene.setMode(t === 'light' ? 'morning' : 'night'); drawBust($('portrait'), t);
   };
   const saved = () => { try { return localStorage.getItem('theme'); } catch (e) { return null; } };
   applyTheme(root.dataset.theme === 'light' ? 'light' : 'dark');
   themeBtn.addEventListener('click', () => { const t = root.dataset.theme === 'light' ? 'dark' : 'light'; applyTheme(t); try { localStorage.setItem('theme', t); } catch (e) { } });
   sysLight.addEventListener('change', e => { if (!saved()) applyTheme(e.matches ? 'light' : 'dark'); });
-
-  const KON = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
-  let kpos = 0;
-  addEventListener('keydown', e => { if (e.target && e.target.tagName === 'INPUT') return; const k = e.key.toLowerCase(); kpos = k === KON[kpos] ? kpos + 1 : k === KON[0] ? 1 : 0; if (kpos === KON.length) { kpos = 0; hero.shower(24); dialogSay('Meteor shower unlocked. Make a wish.'); } });
 
   if (typing) { const t0 = dlgFull; dlgText.textContent = ''; setTimeout(() => dialogSay(t0), 250); }
 })();

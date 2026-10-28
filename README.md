@@ -1,6 +1,6 @@
 # akku-rawat.github.io
 
-My portfolio: a small pixel observatory under a Starry Night sky, with my work, skills and side projects, a "Work with me" section for freelance clients, a résumé download, and light and dark themes.
+My portfolio: a pixel-art Himalayan valley (night in dark mode, sunrise in light mode), with my work, skills and side projects, a "Work with me" section for freelance clients, a résumé download, and light and dark themes.
 
 Live at **https://akku-rawat.github.io**
 
@@ -10,7 +10,7 @@ Live at **https://akku-rawat.github.io**
 | --- | --- |
 | `index.html` | The page |
 | `assets/css/style.css` | Styles |
-| `assets/js/main.js` | The sky, pool table, mobile menu and theme toggle |
+| `assets/js/main.js` | The hero scene, intro portrait, pool table, mobile menu and theme toggle |
 | `Akhilesh_Rawat_Resume.pdf` | The résumé the site links to |
 | `404.html` | Page for links that go nowhere |
 | `favicon.svg`, `favicon.png`, `apple-touch-icon.png` | Icons |
