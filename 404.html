@@ -8,7 +8,7 @@
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#14131E" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#F6F1E6" media="(prefers-color-scheme: light)">
-<script>(function(){var t;try{t=localStorage.getItem("theme")}catch(e){}if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;})();</script>
+<script>(function(){var t;try{t=localStorage.getItem("theme")}catch(e){}if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;var m=document.querySelectorAll('meta[name="theme-color"]');m[1].remove();m=m[0];m.removeAttribute("media");m.content=t==="light"?"#F6F1E6":"#14131E";})();</script>
 <link rel="icon" href="/favicon.png" sizes="48x48">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
