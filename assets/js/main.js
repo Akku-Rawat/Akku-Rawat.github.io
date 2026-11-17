@@ -90,19 +90,19 @@
   const bump = (x, c, w) => Math.exp(-(((x - c) / w) ** 2));
   const hash = n => { const x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
   const SPAL = {
-    night: { sky: ['#0A0916', '#0C0D20', '#111129', '#171632', '#1F1C3D', '#2A2550'],
-      r0: '#2C2854', r0Hi: '#3A3566', r1: '#24204A', r1Hi: '#2F2A5A', r2: '#1C1939', r2Hi: '#28234D', r3: '#17152F', r3Hi: '#221E40', ground: '#13112A', groundHi: '#1C1936', near: '#0F0D20', nearHi: '#1C1934',
+    night: { sky: ['#120E2A', '#171233', '#1E173E', '#271E4A', '#312558', '#3E2F68'],
+      r0: '#2C2854', r0Hi: '#3A3566', r1: '#24204A', r1Hi: '#2F2A5A', r2: '#1C1939', r2Hi: '#28234D', r3: '#17152F', r3Hi: '#221E40', ground: '#191632', groundHi: '#221E40', near: '#14112A', nearHi: '#211D3C',
       snow: '#9C97C6', snowHi: '#C3BEE6', snowSh: '#6F6AA0', forest: '#0F1622', forestHi: '#18212F',
-      water: '#1A2152', water2: '#212A62', waterDeep: '#11152F', waterHi: '#3D4A94', shore: '#2A2F66', refl: '#F1E9D2', refl2: '#C9C2E6', page: '#14131E',
+      water: '#1A2152', water2: '#212A62', waterDeep: '#11152F', waterHi: '#3D4A94', shore: '#2A2F66', refl: '#F1E9D2', refl2: '#C9C2E6', page: '#211B3C',
       tree: '#0A1216', treeHi: '#14222A', house: '#2A2648', roof: '#3E3966', win: '#FFCF6B', glow1: '#4A2E2C', glow2: '#2B1D27' },
     morning: { sky: ['#9DBCE2', '#B5CBE7', '#D4DAE4', '#EFE3D4', '#F6D6B4', '#F3C197'],
       r0: '#DCCDDA', r0Hi: '#E8DAE4', r1: '#C7B4CC', r1Hi: '#D4C2D8', r2: '#AE9BBA', r2Hi: '#BEABC8', r3: '#93819F', r3Hi: '#A592AF', ground: '#7F6E8D', groundHi: '#8F7E9C', near: '#5A4A69', nearHi: '#706083',
       snow: '#FFF8F0', snowHi: '#FFFFFF', snowSh: '#EADBE3', forest: '#5F7469', forestHi: '#728679',
-      water: '#93BBD6', water2: '#A7CBE1', waterDeep: '#7FA2BF', waterHi: '#D9EBF4', shore: '#B9D3E2', refl: '#FFFFFF', refl2: '#FFF1CF', page: '#F6F1E6', mist: '#F8F0E6',
+      water: '#93BBD6', water2: '#A7CBE1', waterDeep: '#7FA2BF', waterHi: '#D9EBF4', shore: '#B9D3E2', refl: '#FFFFFF', refl2: '#FFF1CF', page: '#F3ECDD', mist: '#F8F0E6',
       tree: '#3D4D47', treeHi: '#53655C', house: '#EFE6DA', roof: '#7A6A88', win: '#8E7FA0' }
   };
   const CH = {
-    night: { hair: '#2A1E24', skin: '#C98E62', skinLit: '#E7AE7C', screenLit: '#A9CDEB', hood: '#5D5396', hoodLit: '#8A7BC4', hoodDark: '#433B78', pants: '#2E2A44', shoe: '#17151F', band: '#3A3550', cup: '#EDBE6C', rock: '#3A3550', rockHi: '#4E4870', lid: '#B7B0D6', screen: '#8FD3FF', notes: ['#7FD1B9', '#EDBE6C'] },
+    night: { hair: '#2A1E24', skin: '#C98E62', skinLit: '#E7AE7C', screenLit: '#A9CDEB', hood: '#5D5396', hoodLit: '#8A7BC4', hoodDark: '#433B78', pants: '#2E2A44', shoe: '#17151F', band: '#3A3550', cup: '#EDBE6C', rock: '#3A3550', rockHi: '#4E4870', lid: '#B7B0D6', screen: '#8FD3FF', notes: ['#BBA7F6', '#EDBE6C'] },
     morning: { hair: '#2A1E24', skin: '#C98E62', skinLit: '#D9A072', screenLit: '#D9A072', hood: '#5D5396', hoodLit: '#7366AE', hoodDark: '#463E7A', pants: '#3A3554', shoe: '#22202E', band: '#3A3550', cup: '#E9AE45', rock: '#7F7290', rockHi: '#978AA6', lid: '#D6CFE6', screen: '#CFE6F5', notes: ['#2E8A74', '#B07A1F'] }
   };
   const SCENE = {
@@ -350,10 +350,14 @@
   const yrsMos = (y, m) => { const n = (now.getFullYear() - y) * 12 + now.getMonth() - m + 2, yr = Math.floor(n / 12), mo = n % 12; return [yr && `${yr} yr${yr > 1 ? 's' : ''}`, mo && `${mo} mo${mo > 1 ? 's' : ''}`].filter(Boolean).join(' '); };
   document.querySelectorAll('[data-since]').forEach(el => { const [y, m] = el.dataset.since.split('-').map(Number); el.textContent = yrsMos(y, m); });
 
-  const wins = [...document.querySelectorAll('.nav a')], secs = ['work', 'skills', 'projects', 'services', 'contact'].map(id => $(id));
-  const spy = () => { let cur = ''; secs.forEach(s => { if (s.getBoundingClientRect().top < innerHeight * .4) cur = s.id; }); wins.forEach(a => a.classList.toggle('on', a.dataset.sec === cur)); };
+  const wins = [...document.querySelectorAll('.nav a')], secs = ['work', 'skills', 'projects', 'services', 'contact'].map(id => $(id)), tm = document.querySelector('.topbar');
+  const spy = () => {
+    let cur = ''; secs.forEach(s => { if (s.getBoundingClientRect().top < innerHeight * .4) cur = s.id; });
+    wins.forEach(a => { const on = a.dataset.sec === cur; a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+    tm.classList.toggle('scrolled', scrollY > 8);
+  };
   addEventListener('scroll', spy, { passive: true }); spy();
-  const tm = document.querySelector('.topbar'), menuBtn = $('menuBtn');
+  const menuBtn = $('menuBtn');
   const setMenu = v => { tm.classList.toggle('open', v); menuBtn.setAttribute('aria-expanded', String(v)); menuBtn.textContent = v ? 'Close' : 'Menu'; };
   menuBtn.addEventListener('click', () => setMenu(!tm.classList.contains('open')));
   wins.forEach(a => a.addEventListener('click', () => setMenu(false)));
@@ -361,7 +365,7 @@
   const root = document.documentElement, themeBtn = $('themeBtn'), sysLight = matchMedia('(prefers-color-scheme: light)');
   const applyTheme = t => {
     root.dataset.theme = t;
-    $('themeColor').content = t === 'light' ? '#F6F1E6' : '#14131E';
+    $('themeColor').content = t === 'light' ? '#F3ECDD' : '#211B3C';
     themeBtn.setAttribute('aria-label', t === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
     scene.setMode(t === 'light' ? 'morning' : 'night'); drawBust($('portrait'), t); drawMailbox(t); drawHireArt(t);
   };
@@ -369,6 +373,40 @@
   applyTheme(root.dataset.theme === 'light' ? 'light' : 'dark');
   themeBtn.addEventListener('click', () => { const t = root.dataset.theme === 'light' ? 'dark' : 'light'; applyTheme(t); try { localStorage.setItem('theme', t); } catch (e) { } });
   sysLight.addEventListener('change', e => { if (!saved()) applyTheme(e.matches ? 'light' : 'dark'); });
+
+  // cards fade up as they scroll into view; anything already on screen at load is left alone
+  if (!reduce && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => {
+      let k = 0;
+      es.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target; io.unobserve(el);
+        const done = ev => { if (ev.target !== el || ev.propertyName !== 'transform') return; el.removeEventListener('transitionend', done); el.classList.remove('rv', 'in'); el.style.removeProperty('--d'); };
+        el.addEventListener('transitionend', done);
+        el.style.setProperty('--d', Math.min(k++, 4) * 70 + 'ms'); el.classList.add('in');
+      });
+    }, { rootMargin: '0px 0px -6% 0px' });
+    document.querySelectorAll('.sec-head, .jobs, .case, .more-h, .proj, .sheet, .shop > .entry, .hire, .how, .contact').forEach(el => {
+      if (el.getBoundingClientRect().top < innerHeight) return;
+      el.classList.add('rv'); io.observe(el);
+    });
+  }
+
+
+  const copyBtn = $('copyMail'), copyLabel = copyBtn.querySelector('span'), copyStatus = $('copyStatus');
+  let copyT;
+  copyBtn.addEventListener('click', async () => {
+    const v = copyBtn.dataset.copy;
+    let ok = false;
+    try { await navigator.clipboard.writeText(v); ok = true; } catch (e) {
+      const t = document.createElement('textarea'); t.value = v; t.setAttribute('readonly', ''); t.style.cssText = 'position:fixed;opacity:0'; document.body.append(t); t.select();
+      try { ok = document.execCommand('copy'); } catch (e2) { }
+      t.remove();
+    }
+    copyBtn.classList.toggle('ok', ok); copyLabel.textContent = ok ? 'Copied' : 'Copy failed';
+    copyStatus.textContent = ok ? 'Email address copied' : `Couldn’t copy. The address is ${v}`;
+    clearTimeout(copyT); copyT = setTimeout(() => { copyBtn.classList.remove('ok'); copyLabel.textContent = 'Copy'; copyStatus.textContent = ''; }, 2200);
+  });
 
   if (typing) { const t0 = dlgFull; dlgText.style.visibility = 'hidden'; setTimeout(() => { dlgText.style.visibility = ''; dialogSay(t0); }, 250); }
 })();

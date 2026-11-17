@@ -10,7 +10,7 @@ Live at **https://akku-rawat.github.io**
 | --- | --- |
 | `index.html` | The page |
 | `assets/css/style.css` | Styles |
-| `assets/js/main.js` | The hero scene, intro portrait, pool table, mobile menu and theme toggle |
+| `assets/js/main.js` | The hero scene and the other pixel art, mobile menu, theme toggle, scroll fade-ups and the copy-email button |
 | `Akhilesh_Rawat_Resume.pdf` | The résumé the site links to |
 | `404.html` | Page for links that go nowhere |
 | `favicon.svg`, `favicon.png`, `apple-touch-icon.png` | Icons |
@@ -31,5 +31,5 @@ Then open http://localhost:4000.
 ## Keeping it fresh
 
 - **Résumé:** replace `Akhilesh_Rawat_Resume.pdf` with the new file, keeping the name.
-- **Work:** the three case studies are `<article class="entry">` cards and the rest are `<li class="proj">` rows in `index.html`.
+- **Work:** the three case studies are `<article class="entry case">` cards and the rest are `<li class="proj">` rows in `index.html`.
 - **Services and availability:** the `#services` section in `index.html`.
