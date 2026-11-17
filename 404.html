@@ -6,31 +6,28 @@
 <title>Lost in space · Akhilesh Rawat</title>
 <meta name="robots" content="noindex">
 <meta name="color-scheme" content="dark light">
-<meta name="theme-color" content="#14131E" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#F6F1E6" media="(prefers-color-scheme: light)">
-<script>(function(){var t;try{t=localStorage.getItem("theme")}catch(e){}if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;var m=document.querySelectorAll('meta[name="theme-color"]');m[1].remove();m=m[0];m.removeAttribute("media");m.content=t==="light"?"#F6F1E6":"#14131E";})();</script>
+<meta name="theme-color" content="#0B0B10" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<script>(function(){var t;try{t=localStorage.getItem("theme")}catch(e){}if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t;var m=document.querySelectorAll('meta[name="theme-color"]');m[1].remove();m=m[0];m.removeAttribute("media");m.content=t==="light"?"#FFFFFF":"#0B0B10";})();</script>
 <link rel="icon" href="/favicon.png" sizes="48x48">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap">
 <style>
-:root{--bg:#0E0D18;--card:#17152AF2;--line:#3A3560;--text:#ECE7DC;--muted:#B6B2C8;--dim:#9F9BB7;--accent:#EDBE6C;--btn:#EDBE6C;--btn-hover:#F5CD85;--dot1:#FFFFFF26;--dot2:#EDBE6C30;color-scheme:dark}
-:root[data-theme="light"]{--bg:#F6F1E6;--card:#EDE5D4F2;--line:#D5C9AF;--text:#1B1A33;--muted:#4A4560;--dim:#5A5470;--accent:#8A5700;--btn:#E9AE45;--btn-hover:#F0BD5E;--dot1:#1B1A3318;--dot2:#8A570022;color-scheme:light}
+:root{--bg:#0B0B10;--card:#17171E;--edge:rgba(255,255,255,.07);--text:#F5F5F7;--muted:#A1A1AA;--accent:#0071E3;--accent-hover:#0A84FF;--link:#4DA3FF;color-scheme:dark}
+:root[data-theme="light"]{--bg:#FFFFFF;--card:#F5F5F7;--edge:transparent;--text:#1D1D1F;--muted:#6E6E73;--accent-hover:#0077ED;--link:#0066CC;color-scheme:light}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background-color:var(--bg);background-image:radial-gradient(var(--dot1) 1px,transparent 1.4px),radial-gradient(var(--dot2) 1px,transparent 1.4px);background-size:53px 53px,37px 37px;background-position:0 0,19px 23px;color:var(--text);font:17px/1.7 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-main{max-width:560px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:32px 34px}
-.code{font:12.5px/1.5 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:0}
-h1{font:700 clamp(30px,6vw,42px)/1.1 "Bricolage Grotesque",Arial,sans-serif;letter-spacing:-.03em;margin:10px 0 10px}
+body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:var(--bg);color:var(--text);font:400 17px/1.47 system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:-.022em;-webkit-font-smoothing:antialiased}
+main{max-width:560px;background:var(--card);border:1px solid var(--edge);border-radius:28px;padding:40px}
+.code{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:-.01em;margin:0}
+h1{font:600 clamp(30px,6vw,40px)/1.1 system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:-.015em;margin:8px 0 12px}
 p{margin:0;color:var(--muted)}
-a{display:inline-block;margin-top:22px;padding:11px 18px;border-radius:12px;background:var(--btn);color:#2A1C10;text-decoration:none;font-weight:600}
-a:hover{background:var(--btn-hover)}
-a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+a{display:inline-block;margin-top:24px;padding:10px 20px;border-radius:980px;background:var(--accent);color:#fff;text-decoration:none;font-size:15px}
+a:hover{background:var(--accent-hover)}
+a:focus-visible{outline:2px solid var(--link);outline-offset:3px}
 </style>
 </head>
 <body>
 <main>
-  <p class="code">404 · page not found</p>
+  <p class="code">404 · Page not found</p>
   <h1>This star isn't on the map.</h1>
   <p>The page you were looking for doesn't exist. The rest of the site is right where you left it.</p>
   <a href="/">← Back to the homepage</a>

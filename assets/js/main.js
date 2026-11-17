@@ -25,21 +25,6 @@
     };
   };
 
-  const now = new Date();
-
-  const dlgText = $('dlgText');
-  const typing = !reduce && matchMedia('(min-width: 721px)').matches;
-  let typer, dlgFull = dlgText.textContent;
-  const dialogSay = txt => {
-    dlgFull = txt; clearInterval(typer);
-    if (!typing) { dlgText.textContent = txt; return; }
-    // the untyped rest stays in the layout, hidden, so the card keeps its final height while typing
-    const shown = document.createTextNode(''), rest = document.createElement('span'); rest.style.visibility = 'hidden';
-    let i = 0; dlgText.replaceChildren(shown, rest); rest.textContent = txt;
-    typer = setInterval(() => { i += 2; shown.data = txt.slice(0, i); rest.textContent = txt.slice(i); if (i >= txt.length) { clearInterval(typer); dlgText.textContent = txt; } }, 22);
-  };
-  if (matchMedia('(max-width: 720px)').matches) document.querySelectorAll('details.did').forEach(d => { d.open = false; });
-  dlgText.addEventListener('click', () => { clearInterval(typer); dlgText.textContent = dlgFull; });
 
   const bank = (bg, acc) => [bg, P => { for (let y = 0; y < 4; y++) P.r(10 - y * 2, 3 + y, y * 4 + 1, 1, '#C9C2E6'); P.p(10, 5, acc); P.r(3, 7, 15, 1, '#8D86B0'); [5, 8, 11, 14].forEach(x => P.r(x, 9, 2, 6, '#EFE6D8')); P.r(3, 15, 15, 2, '#8D86B0'); P.r(3, 15, 15, 1, '#C9C2E6'); }];
   const ICONS = {
@@ -90,20 +75,20 @@
   const bump = (x, c, w) => Math.exp(-(((x - c) / w) ** 2));
   const hash = n => { const x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
   const SPAL = {
-    night: { sky: ['#0A0916', '#0C0D20', '#111129', '#171632', '#1F1C3D', '#2A2550'],
-      r0: '#2C2854', r0Hi: '#3A3566', r1: '#24204A', r1Hi: '#2F2A5A', r2: '#1C1939', r2Hi: '#28234D', r3: '#17152F', r3Hi: '#221E40', ground: '#13112A', groundHi: '#1C1936', near: '#0F0D20', nearHi: '#1C1934',
+    night: { sky: ['#120E2A', '#171233', '#1E173E', '#271E4A', '#312558', '#3E2F68'],
+      r0: '#2C2854', r0Hi: '#3A3566', r1: '#24204A', r1Hi: '#2F2A5A', r2: '#1C1939', r2Hi: '#28234D', r3: '#17152F', r3Hi: '#221E40', ground: '#191632', groundHi: '#221E40', near: '#14112A', nearHi: '#211D3C',
       snow: '#9C97C6', snowHi: '#C3BEE6', snowSh: '#6F6AA0', forest: '#0F1622', forestHi: '#18212F',
-      water: '#1A2152', water2: '#212A62', waterDeep: '#11152F', waterHi: '#3D4A94', shore: '#2A2F66', refl: '#F1E9D2', refl2: '#C9C2E6', page: '#14131E',
+      water: '#1A2152', water2: '#212A62', waterDeep: '#11152F', waterHi: '#3D4A94', shore: '#2A2F66', refl: '#F1E9D2', refl2: '#C9C2E6', page: '#0B0B10',
       tree: '#0A1216', treeHi: '#14222A', house: '#2A2648', roof: '#3E3966', win: '#FFCF6B', glow1: '#4A2E2C', glow2: '#2B1D27' },
     morning: { sky: ['#9DBCE2', '#B5CBE7', '#D4DAE4', '#EFE3D4', '#F6D6B4', '#F3C197'],
       r0: '#DCCDDA', r0Hi: '#E8DAE4', r1: '#C7B4CC', r1Hi: '#D4C2D8', r2: '#AE9BBA', r2Hi: '#BEABC8', r3: '#93819F', r3Hi: '#A592AF', ground: '#7F6E8D', groundHi: '#8F7E9C', near: '#5A4A69', nearHi: '#706083',
       snow: '#FFF8F0', snowHi: '#FFFFFF', snowSh: '#EADBE3', forest: '#5F7469', forestHi: '#728679',
-      water: '#93BBD6', water2: '#A7CBE1', waterDeep: '#7FA2BF', waterHi: '#D9EBF4', shore: '#B9D3E2', refl: '#FFFFFF', refl2: '#FFF1CF', page: '#F6F1E6', mist: '#F8F0E6',
+      water: '#93BBD6', water2: '#A7CBE1', waterDeep: '#7FA2BF', waterHi: '#D9EBF4', shore: '#B9D3E2', refl: '#FFFFFF', refl2: '#FFF1CF', page: '#FFFFFF', mist: '#F8F0E6',
       tree: '#3D4D47', treeHi: '#53655C', house: '#EFE6DA', roof: '#7A6A88', win: '#8E7FA0' }
   };
   const CH = {
-    night: { hair: '#2A1E24', skin: '#C98E62', skinLit: '#E7AE7C', screenLit: '#A9CDEB', hood: '#5D5396', hoodLit: '#8A7BC4', hoodDark: '#433B78', pants: '#2E2A44', shoe: '#17151F', band: '#3A3550', cup: '#EDBE6C', rock: '#3A3550', rockHi: '#4E4870', lid: '#B7B0D6', screen: '#8FD3FF', notes: ['#7FD1B9', '#EDBE6C'] },
-    morning: { hair: '#2A1E24', skin: '#C98E62', skinLit: '#D9A072', screenLit: '#D9A072', hood: '#5D5396', hoodLit: '#7366AE', hoodDark: '#463E7A', pants: '#3A3554', shoe: '#22202E', band: '#3A3550', cup: '#E9AE45', rock: '#7F7290', rockHi: '#978AA6', lid: '#D6CFE6', screen: '#CFE6F5', notes: ['#2E8A74', '#B07A1F'] }
+    night: { hair: '#2A1E24', skin: '#C98E62', skinLit: '#E7AE7C', screenLit: '#A9CDEB', shirt: '#BFAC8C', shirtLit: '#E8D0A6', shirtDark: '#93826A', beard: '#5A3D33', beardDark: '#46302A', pants: '#2E2A44', shoe: '#17151F', band: '#3A3550', cup: '#EDBE6C', rock: '#3A3550', rockHi: '#4E4870', lid: '#B7B0D6', screen: '#8FD3FF', notes: ['#BBA7F6', '#EDBE6C'] },
+    morning: { hair: '#2A1E24', skin: '#C98E62', skinLit: '#D9A072', screenLit: '#D9A072', shirt: '#D9C5A3', shirtLit: '#E8D7B8', shirtDark: '#B39F80', beard: '#5A3D33', beardDark: '#46302A', pants: '#3A3554', shoe: '#22202E', band: '#3A3550', cup: '#E9AE45', rock: '#7F7290', rockHi: '#978AA6', lid: '#D6CFE6', screen: '#CFE6F5', notes: ['#2E8A74', '#B07A1F'] }
   };
   const SCENE = {
     d: { w: 320, h: 150, title: [155, 95], stars: 85, horizon: 96, moon: [300, 18, 8], galaxy: [190, 34, .75], planet: [236, 26, .85], halos: [[214, 12], [160, 22], [262, 46]], birds: [[176, 48], [188, 43], [200, 50]],
@@ -228,17 +213,20 @@
     const C = CH[mode], night = mode === 'night';
     P.r(cx - 1, by - 3, 6, 3, C.rock); P.r(cx - 1, by - 3, 6, 1, C.rockHi);
     P.r(cx - 6, by - 5, 7, 2, C.pants); P.r(cx - 7, by - 5, 2, 5, C.pants); P.r(cx - 9, by - 1, 4, 1, C.shoe);
-    P.r(cx - 1, by - 11, 5, 7, C.hood); P.r(cx + 3, by - 11, 1, 7, C.hoodDark); P.r(cx + 2, by - 12, 2, 2, C.hoodDark);
-    P.r(cx - 1, by - 16, 4, 5, C.skin); P.r(cx - 1, by - 17, 5, 2, C.hair); P.r(cx + 2, by - 16, 2, 4, C.hair); P.p(cx - 1, by - 15, C.hair);
+    P.r(cx - 1, by - 11, 5, 7, C.shirt); P.r(cx + 3, by - 11, 1, 7, C.shirtDark);
+    // wavy mullet, longer at the back and flicking out over the collar; short beard along the jaw
+    P.r(cx - 1, by - 16, 4, 5, C.skin); P.r(cx - 1, by - 17, 5, 2, C.hair); P.r(cx + 2, by - 16, 2, 5, C.hair); P.r(cx + 3, by - 11, 1, 2, C.hair); P.p(cx + 4, by - 10, C.hair); P.p(cx - 1, by - 15, C.hair);
+    P.p(cx, by - 17, '#4A3540'); P.p(cx + 3, by - 14, '#4A3540');
+    P.r(cx - 1, by - 12, 3, 1, C.beard); P.p(cx - 1, by - 13, C.beard);
     P.p(cx, by - 14, '#2A1E24');
     P.r(cx - 1, by - 18, 5, 1, C.band); P.p(cx - 1, by - 17, C.band); P.r(cx + 1, by - 15, 2, 3, C.cup); P.p(cx + 1, by - 15, '#FFE09A');
     P.r(cx - 6, by - 6, 5, 1, '#8D86B0');
     [[-6, -7], [-6, -8], [-7, -9], [-7, -10], [-7, -11]].forEach(([dx, dy]) => P.p(cx + dx, by + dy, C.lid));
     [[-6, -9], [-6, -10], [-6, -11]].forEach(([dx, dy]) => P.p(cx + dx, by + dy, C.screen));
-    P.r(cx - 4, by - 8, 4, 1, C.hood); P.r(cx - 5, by - 7, 2, 1, C.skin);
+    P.r(cx - 2, by - 8, 2, 1, C.shirt); P.r(cx - 4, by - 8, 2, 1, C.skin); P.r(cx - 5, by - 7, 2, 1, C.skin);
     if (night) {
-      if (flick > .35) { P.r(cx - 1, by - 11, 1, 6, C.hoodLit); P.p(cx - 1, by - 16, C.skinLit); }
-      P.p(cx - 1, by - 13, C.screenLit); P.p(cx - 1, by - 12, C.screenLit); P.p(cx - 5, by - 7, C.screenLit);
+      if (flick > .35) { P.r(cx - 1, by - 11, 1, 6, C.shirtLit); P.p(cx - 1, by - 16, C.skinLit); }
+      P.p(cx - 5, by - 7, C.screenLit);
     } else {
       P.r(cx + 5, by - 3, 2, 3, '#F6EFE4'); P.p(cx + 5, by - 3, '#C98A3B');
       const ph = (t * .0006) % 1; for (let i = 0; i < 3; i++) { const p = (ph + i / 3) % 1; P.p(cx + 5 + Math.round(Math.sin(p * 6 + i) * .8), by - 5 - Math.round(p * 6), p < .6 ? '#FFFFFF' : '#EDE6DE'); }
@@ -329,39 +317,42 @@
     const P = PX(cv.getContext('2d')), night = theme !== 'light', C = CH[night ? 'night' : 'morning'];
     P.r(0, 0, 24, 24, night ? '#141230' : '#E7DCCB');
     if (night) { [[3, 4], [19, 3], [21, 9], [2, 12]].forEach(([x, y], i) => P.p(x, y, i % 2 ? '#FFE9A8' : '#C9D4FF')); P.r(0, 20, 24, 4, '#2A1E2A'); }
-    else { P.r(0, 0, 24, 9, '#C9D8EA'); P.r(0, 9, 24, 3, '#E9E0D2'); P.r(0, 18, 24, 6, '#CFBFA8'); }
-    for (let y = 17; y < 24; y++) { const w = Math.min(11, Math.round(6 + (y - 17) * 1.3)); P.r(12 - w, y, w * 2, 1, C.hood); P.r(12 + w - 3, y, 3, 1, C.hoodDark); }
-    P.r(9, 16, 6, 2, C.hoodDark); [[10, 19], [13, 19], [10, 20], [13, 20]].forEach(([x, y]) => P.p(x, y, '#E8E0D0'));
-    P.r(10, 14, 4, 3, '#A9744E');
+    else { P.r(0, 0, 24, 9, '#C9D8EA'); P.r(0, 9, 24, 3, '#E9E0D2'); P.r(0, 16, 24, 8, '#B9B0CC'); }
+    for (let y = 17; y < 24; y++) { const w = Math.min(11, Math.round(6 + (y - 17) * 1.3)); P.r(12 - w, y, w * 2, 1, C.shirt); P.r(12 + w - 3, y, 3, 1, C.shirtDark); }
+    P.r(10, 14, 4, 4, '#A9744E'); P.p(9, 17, C.shirtDark); P.p(14, 17, C.shirtDark); P.r(10, 18, 4, 1, C.shirtDark);
     P.r(8, 5, 8, 1, C.skin); P.r(7, 6, 10, 8, C.skin); P.r(8, 14, 8, 1, C.skin); P.r(9, 15, 6, 1, C.skin);
     P.r(15, 9, 2, 5, '#B47C55'); P.r(14, 14, 2, 1, '#B47C55');
     P.r(9, 2, 6, 1, C.hair); P.r(7, 3, 10, 1, C.hair); P.r(6, 4, 12, 2, C.hair); P.r(6, 6, 3, 1, C.hair); P.r(15, 6, 3, 1, C.hair); P.p(10, 6, C.hair); P.p(12, 6, C.hair); P.r(6, 7, 1, 4, C.hair); P.r(17, 7, 1, 4, C.hair);
-    P.p(9, 3, '#4A3540'); P.p(8, 4, '#4A3540');
+    [[9, 3], [8, 4], [12, 3], [11, 4], [15, 3], [14, 4]].forEach(([x, y]) => P.p(x, y, '#4A3540'));
+    // wavy mullet falling behind the neck, the ends flicking out over the shoulders
+    [[5, 12, 2], [5, 13, 2], [6, 14, 2], [7, 15, 2], [7, 16, 3], [7, 17, 2], [6, 18, 1]].forEach(([x, y, w]) => { P.r(x, y, w, 1, C.hair); P.r(24 - x - w, y, w, 1, C.hair); });
+    [[6, 13], [8, 16], [17, 13], [15, 16]].forEach(([x, y]) => P.p(x, y, '#4A3540'));
     P.r(8, 8, 3, 1, C.hair); P.r(13, 8, 3, 1, C.hair);
     P.r(9, 10, 2, 1, '#1A1420'); P.r(13, 10, 2, 1, '#1A1420');
-    P.p(12, 12, '#A9744E'); P.r(11, 13, 2, 1, '#8E4E42');
+    P.p(12, 11, '#A9744E');
+    // short beard with a moustache
+    P.r(7, 11, 1, 3, C.beard); P.r(10, 12, 4, 1, C.beard); P.r(8, 13, 3, 1, C.beard); P.r(13, 13, 3, 1, C.beard); P.r(8, 14, 8, 1, C.beard); P.r(9, 15, 6, 1, C.beard);
+    P.r(16, 11, 1, 3, C.beardDark); P.p(15, 13, C.beardDark); P.r(14, 14, 2, 1, C.beardDark); P.p(14, 15, C.beardDark);
+    P.r(11, 13, 2, 1, '#8E4E42');
     P.r(8, 1, 8, 1, C.band); P.r(6, 2, 2, 1, C.band); P.r(16, 2, 2, 1, C.band); P.r(5, 3, 1, 4, C.band); P.r(18, 3, 1, 4, C.band);
     P.r(4, 7, 3, 5, C.cup); P.r(17, 7, 3, 5, C.cup); P.r(6, 8, 1, 3, '#B8862E'); P.r(17, 8, 1, 3, '#B8862E'); P.p(4, 7, '#FFE09A'); P.p(17, 7, '#FFE09A');
-    if (night) { P.r(7, 7, 1, 6, C.skinLit); P.p(8, 13, '#E7AE7C'); }
+    if (night) P.r(7, 7, 1, 4, C.skinLit);
   };
   drawBust($('portrait'), document.documentElement.dataset.theme);
 
 
-  const yrsMos = (y, m) => { const n = (now.getFullYear() - y) * 12 + now.getMonth() - m + 2, yr = Math.floor(n / 12), mo = n % 12; return [yr && `${yr} yr${yr > 1 ? 's' : ''}`, mo && `${mo} mo${mo > 1 ? 's' : ''}`].filter(Boolean).join(' '); };
-  document.querySelectorAll('[data-since]').forEach(el => { const [y, m] = el.dataset.since.split('-').map(Number); el.textContent = yrsMos(y, m); });
 
-  const wins = [...document.querySelectorAll('.nav a')], secs = ['work', 'skills', 'projects', 'services', 'contact'].map(id => $(id));
-  const spy = () => { let cur = ''; secs.forEach(s => { if (s.getBoundingClientRect().top < innerHeight * .4) cur = s.id; }); wins.forEach(a => a.classList.toggle('on', a.dataset.sec === cur)); };
+  const wins = [...document.querySelectorAll('.nav a')], secs = ['about', 'work', 'services', 'contact'].map(id => $(id)), tm = document.querySelector('.topbar');
+  const spy = () => {
+    let cur = ''; secs.forEach(s => { if (s.getBoundingClientRect().top < innerHeight * .4) cur = s.id; });
+    wins.forEach(a => { const on = a.dataset.sec === cur; a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+    tm.classList.toggle('scrolled', scrollY > 8);
+  };
   addEventListener('scroll', spy, { passive: true }); spy();
-  const tm = document.querySelector('.topbar'), menuBtn = $('menuBtn');
-  const setMenu = v => { tm.classList.toggle('open', v); menuBtn.setAttribute('aria-expanded', String(v)); menuBtn.textContent = v ? 'Close' : 'Menu'; };
-  menuBtn.addEventListener('click', () => setMenu(!tm.classList.contains('open')));
-  wins.forEach(a => a.addEventListener('click', () => setMenu(false)));
-  addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
   const root = document.documentElement, themeBtn = $('themeBtn'), sysLight = matchMedia('(prefers-color-scheme: light)');
   const applyTheme = t => {
     root.dataset.theme = t;
-    $('themeColor').content = t === 'light' ? '#F6F1E6' : '#14131E';
+    $('themeColor').content = t === 'light' ? '#FFFFFF' : '#0B0B10';
     themeBtn.setAttribute('aria-label', t === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
     scene.setMode(t === 'light' ? 'morning' : 'night'); drawBust($('portrait'), t); drawMailbox(t); drawHireArt(t);
   };
@@ -370,5 +361,38 @@
   themeBtn.addEventListener('click', () => { const t = root.dataset.theme === 'light' ? 'dark' : 'light'; applyTheme(t); try { localStorage.setItem('theme', t); } catch (e) { } });
   sysLight.addEventListener('change', e => { if (!saved()) applyTheme(e.matches ? 'light' : 'dark'); });
 
-  if (typing) { const t0 = dlgFull; dlgText.style.visibility = 'hidden'; setTimeout(() => { dlgText.style.visibility = ''; dialogSay(t0); }, 250); }
+  // cards fade up as they scroll into view; anything already on screen at load is left alone
+  if (!reduce && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => {
+      let k = 0;
+      es.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target; io.unobserve(el);
+        const done = ev => { if (ev.target !== el || ev.propertyName !== 'transform') return; el.removeEventListener('transitionend', done); el.classList.remove('rv', 'in'); el.style.removeProperty('--d'); };
+        el.addEventListener('transitionend', done);
+        el.style.setProperty('--d', Math.min(k++, 4) * 70 + 'ms'); el.classList.add('in');
+      });
+    }, { rootMargin: '0px 0px -6% 0px' });
+    document.querySelectorAll('.h2, .tile, .after, .side-h').forEach(el => {
+      if (el.getBoundingClientRect().top < innerHeight) return;
+      el.classList.add('rv'); io.observe(el);
+    });
+  }
+
+
+  const copyBtn = $('copyMail'), copyLabel = copyBtn.querySelector('span'), copyStatus = $('copyStatus');
+  let copyT;
+  copyBtn.addEventListener('click', async () => {
+    const v = copyBtn.dataset.copy;
+    let ok = false;
+    try { await navigator.clipboard.writeText(v); ok = true; } catch (e) {
+      const t = document.createElement('textarea'); t.value = v; t.setAttribute('readonly', ''); t.style.cssText = 'position:fixed;opacity:0'; document.body.append(t); t.select();
+      try { ok = document.execCommand('copy'); } catch (e2) { }
+      t.remove();
+    }
+    copyBtn.classList.toggle('ok', ok); copyLabel.textContent = ok ? 'Copied' : 'Copy failed';
+    copyStatus.textContent = ok ? 'Email address copied' : `Couldn’t copy. The address is ${v}`;
+    clearTimeout(copyT); copyT = setTimeout(() => { copyBtn.classList.remove('ok'); copyLabel.textContent = 'Copy'; copyStatus.textContent = ''; }, 2200);
+  });
+
 })();
