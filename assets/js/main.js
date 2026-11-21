@@ -137,7 +137,21 @@
     P.r(x, base, 1, 2, '#2A1F1A');
   };
 
-  const buildScene = (L, mode) => {
+  // sun (morning) or moon with tonight's real phase (night), centred on mx,my
+  const orb = (P, mode, mx, my, mr) => {
+    const night = mode === 'night';
+    for (let y = -mr - 7; y <= mr + 7; y++) for (let x = -mr - 7; x <= mr + 7; x++) {
+      const dd = Math.hypot(x, y), th = BY[(my + y + 32) % 4][(mx + x + 32) % 4];
+      if (night) { if (dd > mr + 1.5 && dd < mr + 3 && th < 6) P.p(mx + x, my + y, '#5C4E33'); else if (dd > mr + 4.5 && dd < mr + 6 && th < 3) P.p(mx + x, my + y, '#463B2B'); }
+      else if (dd > mr + 1.5 && dd < mr + 2.6) P.p(mx + x, my + y, '#FFE7B0');
+    }
+    for (let y = -mr; y <= mr; y++) for (let x = -mr; x <= mr; x++) { const dd = Math.hypot(x, y); if (dd > mr + .4) continue; P.p(mx + x, my + y, night ? ((x * 5 + y * 3 + 40) % 11 === 0 ? '#D4CBB2' : '#F1E9D2') : (dd > mr - 1.2 ? '#FFDF8F' : '#FFF4D1')); }
+    // its dark side in faint earthshine
+    if (night) { const age = moonAge(Date.now()), c = Math.cos(2 * Math.PI * age / LUN), R = mr + .5; for (let y = -mr; y <= mr; y++) for (let x = -mr; x <= mr; x++) { if (Math.hypot(x, y) > mr + .4) continue; const w = Math.sqrt(Math.max(0, 1 - (y / R) ** 2)), nx = x / R, on = age < LUN / 2 ? nx > w * c : nx < -w * c; if (!on) P.p(mx + x, my + y, (x * 5 + y * 3 + 40) % 7 === 0 ? '#2F2A55' : '#262145'); } }
+  };
+
+  // part: 'sky' = sky without sun/moon, 'land' = everything below on a transparent canvas (for the day/night transition)
+  const buildScene = (L, mode, part) => {
     const W = L.w, H = L.h, c = mk(W, H), g = c.getContext('2d'), P = PX(g), pal = SPAL[mode], night = mode === 'night';
     const img = g.createImageData(W, H), d = img.data, stops = pal.sky.map(hex), n = stops.length - 1, [mx, my, mr] = L.moon;
     const mix = (a, b, f) => a.map((v, j) => v + (b[j] - v) * f);
@@ -156,14 +170,9 @@
     if (night && L.galaxy) { const [gx, gy, gs] = L.galaxy; for (let arm = 0; arm < 2; arm++) for (let th = 0; th < Math.PI * 4.2; th += .05) { const rr = (1.5 + th * 1.12) * gs, a = th + arm * Math.PI; P.p(gx + Math.cos(a) * rr, gy + Math.sin(a) * rr * .8, Math.floor(th * 6) % 3 ? '#2A3577' : '#36468F'); } }
     if (night) L.halos.forEach(([hx, hy]) => { for (let y = -7; y <= 7; y++) for (let x = -7; x <= 7; x++) { const dd = Math.hypot(x, y), th = BY[(hy + y + 32) % 4][(hx + x + 32) % 4]; if (dd > 2.5 && dd < 3.6 && th < 9) P.p(hx + x, hy + y, '#7E6A3E'); else if (dd > 4.6 && dd < 5.7 && th < 4) P.p(hx + x, hy + y, '#4E4430'); } });
     if (L.planet) drawPlanet(P, L.planet[0], L.planet[1], L.planet[2], mode);
-    for (let y = -mr - 7; y <= mr + 7; y++) for (let x = -mr - 7; x <= mr + 7; x++) {
-      const dd = Math.hypot(x, y), th = BY[(my + y + 32) % 4][(mx + x + 32) % 4];
-      if (night) { if (dd > mr + 1.5 && dd < mr + 3 && th < 6) P.p(mx + x, my + y, '#5C4E33'); else if (dd > mr + 4.5 && dd < mr + 6 && th < 3) P.p(mx + x, my + y, '#463B2B'); }
-      else if (dd > mr + 1.5 && dd < mr + 2.6) P.p(mx + x, my + y, '#FFE7B0');
-    }
-    for (let y = -mr; y <= mr; y++) for (let x = -mr; x <= mr; x++) { const dd = Math.hypot(x, y); if (dd > mr + .4) continue; P.p(mx + x, my + y, night ? ((x * 5 + y * 3 + 40) % 11 === 0 ? '#D4CBB2' : '#F1E9D2') : (dd > mr - 1.2 ? '#FFDF8F' : '#FFF4D1')); }
-    // the hero moon shows tonight's real phase, its dark side in faint earthshine
-    if (night) { const age = moonAge(Date.now()), c = Math.cos(2 * Math.PI * age / LUN), R = mr + .5; for (let y = -mr; y <= mr; y++) for (let x = -mr; x <= mr; x++) { if (Math.hypot(x, y) > mr + .4) continue; const w = Math.sqrt(Math.max(0, 1 - (y / R) ** 2)), nx = x / R, on = age < LUN / 2 ? nx > w * c : nx < -w * c; if (!on) P.p(mx + x, my + y, (x * 5 + y * 3 + 40) % 7 === 0 ? '#2F2A55' : '#262145'); } }
+    if (part === 'sky') return c;
+    orb(P, mode, mx, my, mr);
+    if (part === 'land') g.clearRect(0, 0, W, H);
     const ridges = L.layers.map(ridgeFn), windows = [];
     L.layers.forEach((ly, li) => {
       const f = ridges[li], col = pal[ly.c], hi = pal[ly.c + 'Hi'];
@@ -240,11 +249,46 @@
 
   const NOTE = [[0, 1, 1], [0, 1, 0], [1, 1, 0], [1, 1, 0]];
   // the scene is drawn at native size into a buffer, scaled up by a whole number B, then the fire and figure go on top k times bigger
+  // day <-> night, lit by the sun: as it sinks the sky far from it darkens first and the glow around it last,
+  // a golden-hour tint follows it down, the land catches a warm rim then goes dark, and stars come out where
+  // the sky is already dark. Light steps in fine dithered levels so it stays pixel art.
+  let TRANS = null;
+  const sm = (p, a, z) => { const k = Math.min(1, Math.max(0, (p - a) / (z - a))); return k * k * (3 - 2 * k); };
+  const WARM = [255, 136, 88];
+  const blend = (L, b, p) => {
+    const o = b.other, toN = b.night, Dy = toN ? o : b, Nt = toN ? b : o, W = L.w, H = L.h, d = b.buf.data, l = b.lbuf.data;
+    const [mx, my, mr] = L.moon, drop = L.horizon - my + mr + 8;
+    // heights: 1 = in its place, 0 = below the ridges. The moon follows the sun a beat later.
+    const sun = toN ? 1 - sm(p, 0, .75) : sm(p, .05, .8), moon = toN ? sm(p, .4, 1) : 1 - sm(p, 0, .45);
+    const sx = mx + (1 - sun) * W * .03, sy = my + (1 - sun) * drop, gl = sm(sun, .02, 1), mid = gl * (1 - gl) * 4, warm = Math.sin(Math.PI * Math.min(1, sun * 1.2));
+    const R = W * .8, near = (x, y) => Math.max(0, 1 - Math.hypot(x - sx, (y - sy) * 1.5) / R);
+    const litAt = (x, y, n = near(x, y)) => Math.min(1, Math.max(0, gl + (n * n * .9 - (1 - n) * .35) * mid));
+    const lv = (v, bay, n) => Math.min(1, Math.floor(v * n + bay) / n);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 4, bay = (BY[y % 4][x % 4] + .5) / 16, n = near(x, y);
+      const s = lv(litAt(x, y, n), bay, 12), tw = lv(warm * n ** 1.5 * (1 - s * .5) * .6 * (.4 + .6 * Math.min(1, y / L.horizon)), bay, 6);
+      for (let c = 0; c < 3; c++) { const v = Nt.sky[i + c] + (Dy.sky[i + c] - Nt.sky[i + c]) * s; d[i + c] = v + (WARM[c] - v) * tw; }
+      d[i + 3] = 255;
+      if (Dy.land[i + 3]) {
+        const ls = lv(Math.min(1, Math.max(0, gl + (n * .6 - .2) * mid)), bay, 10), lw = lv(warm * n * .35 * (1 - ls * .4), bay, 5);
+        for (let c = 0; c < 3; c++) { const v = Nt.land[i + c] + (Dy.land[i + c] - Nt.land[i + c]) * ls; l[i + c] = v + (WARM[c] - v) * lw; }
+        l[i + 3] = 255;
+      } else l[i + 3] = 0;
+    }
+    // sky, then stars where it is dark enough, the moon and sun, then the land on top so they set and rise behind the ridges
+    b.g.putImageData(b.buf, 0, 0);
+    Nt.S.stars.forEach((s, j) => { if (litAt(s.x, s.y) < .4 - hash(j + 1) * .3) b.P.p(s.x, s.y, s.c); });
+    orb(b.P, 'night', Math.round(mx - (1 - moon) * W * .05), Math.round(my + (1 - moon) * drop), mr);
+    orb(b.P, 'morning', Math.round(sx), Math.round(sy), mr);
+    b.lc.getContext('2d').putImageData(b.lbuf, 0, 0); b.g.drawImage(b.lc, 0, 0);
+  };
+
   const drawScene = (L, b, mode, t) => {
     const { S, P, g, out, B } = b, night = mode === 'night', pal = SPAL[mode], W = L.w;
-    g.drawImage(S.canvas, 0, 0);
+    const tr = TRANS && TRANS.to === mode && t - TRANS.t0 < TRANS.D;
+    if (tr) blend(L, b, Math.max(0, (t - TRANS.t0) / TRANS.D)); else g.drawImage(S.canvas, 0, 0);
     if (night) {
-      S.stars.forEach(s => { const q = Math.sin(t * .0021 * s.sp + s.ph); P.p(s.x, s.y, q > .35 ? s.c : s.d); if (s.big && q > .85) { P.p(s.x - 1, s.y, s.d); P.p(s.x + 1, s.y, s.d); P.p(s.x, s.y - 1, s.d); P.p(s.x, s.y + 1, s.d); } });
+      if (!tr) S.stars.forEach(s => { const q = Math.sin(t * .0021 * s.sp + s.ph); P.p(s.x, s.y, q > .35 ? s.c : s.d); if (s.big && q > .85) { P.p(s.x - 1, s.y, s.d); P.p(s.x + 1, s.y, s.d); P.p(s.x, s.y - 1, s.d); P.p(s.x, s.y + 1, s.d); } });
       L.halos.forEach(([hx, hy], i) => P.r(hx, hy, 2, 2, Math.sin(t * .0024 + i * 1.7) > -.2 ? '#FFF4C8' : '#E9C46A'));
       if (L.galaxy) { const [gx, gy, gs] = L.galaxy, th0 = (t * .0016) % (Math.PI * 4.2); for (let arm = 0; arm < 2; arm++) for (let k = 0; k < 6; k++) { const th = (th0 + k * .06) % (Math.PI * 4.2), rr = (1.5 + th * 1.12) * gs, a = th + arm * Math.PI; P.p(gx + Math.cos(a) * rr, gy + Math.sin(a) * rr * .8, '#5266B8'); } }
       S.windows.forEach(([x, y], i) => P.p(x, y, Math.sin(t * .0013 + i * 2.3) > -.6 ? '#FFCF6B' : '#C98A3B'));
@@ -302,20 +346,29 @@
 
   const scene = (() => {
     const box = $('home'), cvs = { night: $('heroNight'), morning: $('heroMorning') }, phone = matchMedia('(max-width: 720px)');
-    let L, built = {}, mode = document.documentElement.dataset.theme === 'light' ? 'morning' : 'night', bothUntil = 0, vis = true, last = 0;
+    let L, built = {}, mode = document.documentElement.dataset.theme === 'light' ? 'morning' : 'night', bothUntil = 0, vis = true, last = 0, dnT;
     const setup = () => {
       L = SCENE[phone.matches ? 'm' : 'd']; built = {};
       const B = L.k > 1 ? 4 : 1;
-      Object.entries(cvs).forEach(([m, cv]) => { cv.width = L.w * B; cv.height = L.h * B; const g = mk(L.w, L.h).getContext('2d'); built[m] = { S: buildScene(L, m), g, P: PX(g), out: cv.getContext('2d'), B }; });
+      const px = c => c.getContext('2d').getImageData(0, 0, L.w, L.h).data;
+      Object.entries(cvs).forEach(([m, cv]) => { cv.width = L.w * B; cv.height = L.h * B; const g = mk(L.w, L.h).getContext('2d'); built[m] = { S: buildScene(L, m), g, P: PX(g), out: cv.getContext('2d'), B, night: m === 'night' }; });
+      if (!reduce) Object.entries(built).forEach(([m, b]) => Object.assign(b, { sky: px(buildScene(L, m, 'sky')), land: px(buildScene(L, m, 'land').canvas), other: built[m === 'night' ? 'morning' : 'night'], buf: b.g.createImageData(L.w, L.h), lbuf: b.g.createImageData(L.w, L.h), lc: mk(L.w, L.h) }));
       paint(reduce ? 2400 : performance.now(), true);
     };
     const paint = (t, all) => Object.entries(built).forEach(([m, b]) => { if (all || m === mode || t < bothUntil) drawScene(L, b, m, t); });
     phone.addEventListener('change', setup);
     watch(box, v => { vis = v; });
     setup();
-    const loop = t => { if (!reduce && vis && t - last > 60) { last = t; paint(t, false); } requestAnimationFrame(loop); };
+    // ~60fps while the sky changes, ~16fps otherwise
+    const loop = t => { if (!reduce && vis && t - last > (TRANS && t - TRANS.t0 < TRANS.D ? 14 : 60)) { last = t; paint(t, false); } requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
-    return { shoot: (fx, fy) => { const S = built.night.S; (S.shots ||= []).push({ x: fx * L.w, y: fy * L.h, t0: performance.now() }); }, setMode: m => { if (m === mode) return; mode = m; bothUntil = performance.now() + 1200; if (reduce) paint(2400, true); } };
+    return { shoot: (fx, fy) => { const S = built.night.S; (S.shots ||= []).push({ x: fx * L.w, y: fy * L.h, t0: performance.now() }); }, setMode: m => {
+      if (m === mode) return; mode = m;
+      if (reduce) { bothUntil = performance.now() + 1200; paint(2400, true); return; }
+      // the canvases swap instantly; the animation itself plays out on the new one
+      const r = document.documentElement; TRANS = { to: m, t0: performance.now(), D: 3200 };
+      r.classList.add('dn'); paint(TRANS.t0, false); clearTimeout(dnT); dnT = setTimeout(() => r.classList.remove('dn'), 100);
+    } };
   })();
 
   const drawHireArt = theme => {
@@ -849,4 +902,61 @@ document.querySelectorAll('.tile').forEach(t => t.addEventListener('pointermove'
   $('#scopeNext').addEventListener('click', () => { idx = (idx + 1) % items.length; show(); });
   addEventListener('keydown', e => { if (scope.hidden) return; if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') $('#scopeNext').click(); if (e.key === 'ArrowLeft') $('#scopePrev').click(); });
   window.openScope = open;
+}
+
+
+// ---------- Motion: intro, parallax, headings, tilt, magnetic buttons, confetti, theme circle ----------
+{
+  const $ = s => document.querySelector(s), root = document.documentElement, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce) {
+    // 1 · split the name into letters
+    const h1 = $('.hero h1'), name = h1.textContent; let i = 0;
+    h1.setAttribute('aria-label', name);
+    h1.innerHTML = name.split(' ').map(w => `<span class="ln" aria-hidden="true">${[...w].map(c => `<span class="ch" style="--i:${i++}">${c}</span>`).join('')}</span>`).join('');
+
+    // 2 · parallax + 6 · progress, one scroll handler
+    const hero = $('#home'), bar = $('.topbar .wrap'); let ticking = false;
+    const onScroll = () => {
+      ticking = false;
+      const p = Math.min(1, Math.max(0, scrollY / hero.offsetHeight)); hero.style.setProperty('--p', p.toFixed(3));
+      bar.style.setProperty('--sp', (scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight)).toFixed(3));
+    };
+    addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true }); onScroll();
+
+    // 3 · headings word by word, kickers written in
+    document.querySelectorAll('.h2').forEach(h => { h.innerHTML = h.textContent.split(' ').map((w, k) => `<span class="w" style="--i:${k}">${w}</span>`).join(' '); });
+    // a clipped element never reports as visible, so each kicker is revealed by its heading
+    const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const h = e.target, k = h.nextElementSibling; h.classList.add('seen'); if (k?.classList.contains('kick')) k.classList.add('seen'); io.unobserve(h); }), { threshold: .4 });
+    document.querySelectorAll('.h2').forEach(el => io.observe(el));
+
+    // 4 · tilt cards toward the cursor
+    if (matchMedia('(hover: hover)').matches) document.querySelectorAll('.work, .side').forEach(t => {
+      t.addEventListener('pointermove', e => { const r = t.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5; t.classList.add('tilt'); t.style.transform = `perspective(900px) rotateX(${(-y * 6).toFixed(2)}deg) rotateY(${(x * 7).toFixed(2)}deg) translateY(-4px)`; });
+      t.addEventListener('pointerleave', () => { t.style.transform = ''; setTimeout(() => t.classList.remove('tilt'), 150); });
+    });
+
+    // 5 · magnetic buttons
+    if (matchMedia('(hover: hover)').matches) document.querySelectorAll('.btn:not(.ghost), .pill-sm').forEach(b => {
+      b.addEventListener('pointermove', e => { const r = b.getBoundingClientRect(); b.style.transform = `translate(${((e.clientX - r.left) / r.width - .5) * 8}px, ${((e.clientY - r.top) / r.height - .5) * 6}px)`; });
+      b.addEventListener('pointerleave', () => { b.style.transform = ''; });
+    });
+
+    // 8 · confetti when the email is copied
+    $('#copyMail')?.addEventListener('click', e => {
+      const r = e.currentTarget.getBoundingClientRect();
+      for (let k = 0; k < 22; k++) { const c = document.createElement('i'); c.className = 'conf'; c.style.left = r.left + r.width / 2 + 'px'; c.style.top = r.top + 'px'; c.style.background = ['#0071E3', '#EDBE6C', '#C9C2E6', '#7FD1B9', '#FFB347'][k % 5]; c.style.setProperty('--dx', (Math.random() - .5) * 220 + 'px'); c.style.setProperty('--dy', -60 - Math.random() * 140 + 'px'); c.style.setProperty('--r', (Math.random() - .5) * 540 + 'deg'); document.body.append(c); c.addEventListener('animationend', () => c.remove()); }
+    });
+
+    // 9 · day/night as a spreading circle (View Transitions, where supported)
+    const tb = $('#themeBtn');
+    if (document.startViewTransition) tb.addEventListener('click', e => {
+      if (e.detail === -1) return; // our own replayed click
+      e.stopImmediatePropagation();
+      const r = tb.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2, end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+      root.classList.add('vt');
+      const vt = document.startViewTransition(() => tb.dispatchEvent(new MouseEvent('click', { detail: -1 })));
+      vt.ready.then(() => root.animate({ clipPath: [`circle(0 at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] }, { duration: 750, easing: 'cubic-bezier(.2,.8,.2,1)', pseudoElement: '::view-transition-new(root)' }));
+      vt.finished.finally(() => root.classList.remove('vt'));
+    }, true);
+  }
 }
