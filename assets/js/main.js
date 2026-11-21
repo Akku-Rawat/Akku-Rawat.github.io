@@ -521,7 +521,7 @@
     sky.append(s); s.addEventListener('animationend', () => s.remove());
   };
   sky.addEventListener('click', e => { const r = sky.getBoundingClientRect(); shoot(e.clientX - r.left, e.clientY - r.top); });
-  addEventListener('keydown', e => { if (e.key.toLowerCase() === 's' && !e.metaKey && !e.ctrlKey && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) shoot(); });
+  addEventListener('keydown', e => { if (!e.repeat && (e.key || '').toLowerCase() === 's' && !e.metaKey && !e.ctrlKey && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) shoot(); });
   setInterval(() => { if (root.dataset.theme === 'dark' && !document.hidden && sky.getBoundingClientRect().bottom > 0) shoot(); }, 14000);
 
 })();
@@ -567,14 +567,14 @@ document.querySelectorAll('.tile').forEach(t => t.addEventListener('pointermove'
   const toggleKeys = o => { keys.hidden = !o; if (o) keys.querySelector('div').focus?.(); };
   keys.addEventListener('click', e => { if (e.target === keys) toggleKeys(false); });
   addEventListener('keydown', e => {
-    if (e.metaKey || e.ctrlKey || e.altKey || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
-    const k = e.key.toLowerCase();
+    if (e.repeat || e.metaKey || e.ctrlKey || e.altKey || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+    const k = (e.key || '').toLowerCase();
     if (k === '?') toggleKeys(keys.hidden);
     else if (k === 'escape') toggleKeys(false);
     else if (k === 't') $('#themeBtn').click();
-    else if (k === 'a') { $('#about').scrollIntoView({ behavior: 'smooth', block: 'center' }); $('#askBtn').click(); }
+    else if (k === 'q') { $('#about').scrollIntoView({ behavior: 'smooth', block: 'center' }); $('#askBtn').click(); }
     else if (k === 'w') $('#work').scrollIntoView({ behavior: 'smooth' });
-    else if (k === 'r') location.href = 'Akhilesh_Rawat_Resume.pdf';
+    else if (k === 'r') open('Akhilesh_Rawat_Resume.pdf', '_blank', 'noopener'); // a new tab, so a stray keypress never leaves the page
   });
 
 }
@@ -650,7 +650,7 @@ document.querySelectorAll('.tile').forEach(t => t.addEventListener('pointermove'
   hero.addEventListener('click', e => { if (!e.target.closest('.spot')) find('wish'); });
   let buf = '';
   addEventListener('keydown', e => {
-    if (!e.isTrusted || e.metaKey || e.ctrlKey || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+    if (!e.isTrusted || !e.key || e.metaKey || e.ctrlKey || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
     if (e.key.toLowerCase() === 's') find('wish');
     buf = (buf + e.key.toLowerCase()).slice(-4);
     if (buf === 'chai') { find('chai'); if (got.size < SECRETS.length) setTimeout(() => toast('<small>Chai refilled</small>Productivity +10%. Typing speed +20%. Sleep −1 hour.'), 4300); }
@@ -955,8 +955,8 @@ document.querySelectorAll('.tile').forEach(t => t.addEventListener('pointermove'
       const r = tb.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2, end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
       root.classList.add('vt');
       const vt = document.startViewTransition(() => tb.dispatchEvent(new MouseEvent('click', { detail: -1 })));
-      vt.ready.then(() => root.animate({ clipPath: [`circle(0 at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] }, { duration: 750, easing: 'cubic-bezier(.2,.8,.2,1)', pseudoElement: '::view-transition-new(root)' }));
-      vt.finished.finally(() => root.classList.remove('vt'));
+      vt.ready.then(() => root.animate({ clipPath: [`circle(0 at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] }, { duration: 750, easing: 'cubic-bezier(.2,.8,.2,1)', pseudoElement: '::view-transition-new(root)' })).catch(() => {}); // a resize or a quick second click cancels it: fine
+      vt.finished.catch(() => {}).finally(() => root.classList.remove('vt'));
     }, true);
   }
 }

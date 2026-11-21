@@ -279,11 +279,13 @@ main > section{padding-top:128px}
 .now>div{background:var(--tile);border-radius:22px;box-shadow:var(--shadow),var(--hl)}
 .bubble{border-radius:20px;box-shadow:var(--shadow-hi)}
 
-/* Work with me: a dark feature card, like Apple's closing panels, in both themes */
-.hire{--text:#F5F5F7;--muted:#A1A1AA;--line:rgba(255,255,255,.1);--link:#4DA3FF;--ok:#30D158;--edge:rgba(255,255,255,.08);
-  color:var(--text);padding:44px 48px;border-radius:32px;background:radial-gradient(120% 150% at 88% -10%,#26254A 0%,#14141F 45%,#0E0E13 100%);box-shadow:var(--shadow-hi),inset 0 1px 0 rgba(255,255,255,.07)}
+/* Work with me: the feature card. Light: white with a faint blue glow. Dark: deep indigo, like Apple's closing panels. */
+.hire{color:var(--text);padding:44px 48px;border-radius:32px;background:radial-gradient(120% 150% at 88% -10%,color-mix(in srgb,var(--accent) 9%,#fff) 0%,#FFFFFF 55%);box-shadow:var(--shadow-hi),var(--hl)}
+:root[data-theme="dark"] .hire{--text:#F5F5F7;--muted:#A1A1AA;--line:rgba(255,255,255,.1);--link:#4DA3FF;--ok:#30D158;--edge:rgba(255,255,255,.08);
+  background:radial-gradient(120% 150% at 88% -10%,#26254A 0%,#14141F 45%,#0E0E13 100%);box-shadow:var(--shadow-hi),inset 0 1px 0 rgba(255,255,255,.07)}
 .hire::before{display:none}
-.hire .art,.hire .mailbox{box-shadow:0 0 0 1px rgba(255,255,255,.08),0 18px 36px -16px rgba(0,0,0,.8)}
+.hire .art,.hire .mailbox{box-shadow:0 0 0 1px var(--edge),0 18px 36px -16px rgba(0,0,0,.35)}
+:root[data-theme="dark"] .hire .art,:root[data-theme="dark"] .hire .mailbox{box-shadow:0 0 0 1px rgba(255,255,255,.08),0 18px 36px -16px rgba(0,0,0,.8)}
 @media (max-width:720px){.hire{padding:28px 22px}}
 
 /* Fine grain on the page body (not the pixel art) */
@@ -448,3 +450,15 @@ main::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:30;
 ::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
 .vt .hero .cv-m,.dn .hero .cv-m{transition:none!important} /* the pixel sunset/sunrise plays on the canvas itself */
 
+
+/* ---------- Review fixes ---------- */
+/* touch targets: standalone links get a 44px hit area without changing how they look */
+.brand,.nav a,.more,.links a,.foot a{min-height:44px;display:inline-flex;align-items:center}
+.links{gap:0}
+.foot .wrap{align-items:center}
+@media (max-width:720px){.links{gap:0 24px}}
+.email .btn{min-height:40px;padding:0 16px}
+/* phones: 100vh includes the area under Safari's address bar, dvh doesn't */
+.scope .box{max-height:calc(100dvh - 24px)}
+.keys>div{max-height:calc(100dvh - 32px);overflow:auto}
+.keys>div:focus{outline:none}
