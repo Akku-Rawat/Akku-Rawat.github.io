@@ -74,6 +74,9 @@
 
   const bump = (x, c, w) => Math.exp(-(((x - c) / w) ** 2));
   const hash = n => { const x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
+  // moon phase from a known new moon (6 Jan 2000 18:14 UTC); the hero and the Now strip both use it
+  const LUN = 29.530588853, NEW = Date.UTC(2000, 0, 6, 18, 14);
+  const moonAge = ms => (((ms - NEW) / 864e5) % LUN + LUN) % LUN;
   const SPAL = {
     night: { sky: ['#120E2A', '#171233', '#1E173E', '#271E4A', '#312558', '#3E2F68'],
       r0: '#2C2854', r0Hi: '#3A3566', r1: '#24204A', r1Hi: '#2F2A5A', r2: '#1C1939', r2Hi: '#28234D', r3: '#17152F', r3Hi: '#221E40', ground: '#191632', groundHi: '#221E40', near: '#14112A', nearHi: '#211D3C',
@@ -159,6 +162,8 @@
       else if (dd > mr + 1.5 && dd < mr + 2.6) P.p(mx + x, my + y, '#FFE7B0');
     }
     for (let y = -mr; y <= mr; y++) for (let x = -mr; x <= mr; x++) { const dd = Math.hypot(x, y); if (dd > mr + .4) continue; P.p(mx + x, my + y, night ? ((x * 5 + y * 3 + 40) % 11 === 0 ? '#D4CBB2' : '#F1E9D2') : (dd > mr - 1.2 ? '#FFDF8F' : '#FFF4D1')); }
+    // the hero moon shows tonight's real phase, its dark side in faint earthshine
+    if (night) { const age = moonAge(Date.now()), c = Math.cos(2 * Math.PI * age / LUN), R = mr + .5; for (let y = -mr; y <= mr; y++) for (let x = -mr; x <= mr; x++) { if (Math.hypot(x, y) > mr + .4) continue; const w = Math.sqrt(Math.max(0, 1 - (y / R) ** 2)), nx = x / R, on = age < LUN / 2 ? nx > w * c : nx < -w * c; if (!on) P.p(mx + x, my + y, (x * 5 + y * 3 + 40) % 7 === 0 ? '#2F2A55' : '#262145'); } }
     const ridges = L.layers.map(ridgeFn), windows = [];
     L.layers.forEach((ly, li) => {
       const f = ridges[li], col = pal[ly.c], hi = pal[ly.c + 'Hi'];
@@ -249,6 +254,8 @@
     const [mx] = L.moon, tt = t * .0022;
     S.water.forEach(([x, y, refl]) => {
       if (Math.abs(x - mx) <= 1 + (y % 4 === 0 ? 1 : 0)) { if (BY[y % 4][(x + Math.floor(t / 180)) % 4] < 4) P.p(x, y, night ? (y % 2 ? pal.refl : pal.refl2) : (y % 2 ? '#FFF1CF' : '#FFFFFF')); return; }
+      // firelight flickering on the water near the fire
+      if (night && Math.abs(x - S.fx) < 12) { const near = 1 - Math.abs(x - S.fx) / 12, h = hash(x * 3.7 + y * 1.3 + Math.floor(t / 140)); if (h > .9 - .2 * near) { P.p(x, y, h > .965 ? '#FFC36B' : '#B4643F'); return; } }
       const s = Math.sin(x * .45 + y * 1.7 - tt);
       if (s > (night ? .94 : .995 - .06 * bump(x, mx, W * .16))) P.p(x, y, night ? (refl ? pal.shore : pal.waterHi) : pal.refl);
       else if (night && !refl && hash(x * 7.7 + y * 3.3) > .985 && Math.sin(t * .003 + x) > .3) P.p(x, y, pal.refl2);
@@ -256,6 +263,16 @@
     if (!night) {
       const [y0, y1] = L.mist, mid = (y0 + y1) / 2, half = (y1 - y0) / 2, off = Math.floor(t * .004);
       for (let y = y0; y <= y1; y++) { const fall = 1 - Math.abs(y - mid) / half; for (let x = 0; x < W; x++) { if (y >= S.nearY(x) || L.trees.some(([tx, th]) => Math.abs(x - tx) <= th * .3 + 2)) continue; const dens = fall * (1.4 + 1.8 * Math.sin(x * .05 + t * .0004 + y * .3)) * (S.wet[y * W + x] ? .4 : 1); if (BY[y % 4][(x + off) % 4] + 1 < dens) P.p(x, y, pal.mist); } }
+    }
+    // chimney smoke from the village houses
+    S.windows.forEach(([wx, wy], i) => { for (let k = 0; k < 4; k++) { const ph = (t * .0003 + k / 4 + i * .37) % 1; P.p(wx + 3 + Math.round(Math.sin(ph * 4 + i) * ph * 2 + ph * 3), wy - 4 - Math.round(ph * 9), night ? (ph < .5 ? '#55508A' : '#3A3566') : (ph < .5 ? '#FBF6F2' : '#EDE3EA')); } });
+    if (night) {
+      // fireflies by the trees
+      const span = Math.max(20, W - S.fx - 34);
+      for (let k = 0; k < 8; k++) { const x = Math.round(S.fx + 30 + (k * 37 % span) + Math.sin(t * .0007 + k * 2) * 6); if (x < 0 || x >= W) continue; const y = Math.round(S.nearY(x) - 3 - (k % 4) * 3 + Math.sin(t * .0011 + k) * 2), b = Math.sin(t * .004 + k * 1.9); if (b > .2) { P.p(x, y, b > .7 ? '#F2FFB0' : '#A9C25A'); if (b > .7) [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([u, v]) => P.p(x + u, y + v, '#4F6A3A')); } }
+      // pixel shooting stars queued by scene.shoot
+      S.shots = (S.shots || []).filter(s => t - s.t0 < 800);
+      S.shots.forEach(s => { const p = (t - s.t0) / 800, hx = s.x - p * 50, hy = s.y + p * 21; for (let i = 0; i < 22; i++) { const a = i / 22; if (a > 1.2 - p) continue; P.p(Math.round(hx + i), Math.round(hy - i * .42), i === 0 ? '#FFFFFF' : a < .25 ? '#FFE9A8' : a < .6 ? '#C9C2E6' : '#5C5590'); } });
     }
     const fx = S.fx, fy = S.fy, flick = .5 + .5 * Math.sin(t * .021) * Math.sin(t * .013 + 1);
     if (night) S.glow.forEach(([x, y, k]) => { if (k * 15 * (.8 + .3 * flick) > BY[y % 4][x % 4] + 4) P.p(x, y, k > .55 ? pal.glow1 : pal.glow2); });
@@ -298,7 +315,7 @@
     setup();
     const loop = t => { if (!reduce && vis && t - last > 60) { last = t; paint(t, false); } requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
-    return { setMode: m => { if (m === mode) return; mode = m; bothUntil = performance.now() + 1200; if (reduce) paint(2400, true); } };
+    return { shoot: (fx, fy) => { const S = built.night.S; (S.shots ||= []).push({ x: fx * L.w, y: fy * L.h, t0: performance.now() }); }, setMode: m => { if (m === mode) return; mode = m; bothUntil = performance.now() + 1200; if (reduce) paint(2400, true); } };
   })();
 
   const drawHireArt = theme => {
@@ -418,9 +435,7 @@
   addEventListener('keydown', e => { if (e.key === 'Escape' && !bub.hidden) { setOpen(false); askBtn.focus(); } });
   document.addEventListener('click', e => { if (!bub.hidden && !e.target.closest('.ask')) setOpen(false); });
 
-  // Now strip: tonight's real moon phase, from a known new moon (6 Jan 2000 18:14 UTC)
-  const LUN = 29.530588853, NEW = Date.UTC(2000, 0, 6, 18, 14);
-  const moonAge = ms => (((ms - NEW) / 864e5) % LUN + LUN) % LUN;
+  // Now strip: tonight's real moon phase
   console.assert(Math.min(moonAge(Date.UTC(2024, 3, 8, 18, 21)), LUN - moonAge(Date.UTC(2024, 3, 8, 18, 21))) < 1, 'new moon 8 Apr 2024');
   console.assert(Math.abs(moonAge(Date.UTC(2024, 8, 18, 2, 34)) - LUN / 2) < 1, 'full moon 18 Sep 2024');
   const age = moonAge(Date.now()), ang = 2 * Math.PI * age / LUN, lit = Math.round((1 - Math.cos(ang)) / 2 * 100);
@@ -443,7 +458,10 @@
   const sky = $('home');
   const shoot = (x, y) => {
     if (reduce) return;
-    const r = sky.getBoundingClientRect(), s = document.createElement('i');
+    const r = sky.getBoundingClientRect();
+    // night: drawn into the pixel scene; morning: a soft CSS streak
+    if (root.dataset.theme === 'dark') { scene.shoot((x ?? r.width * (.35 + Math.random() * .6)) / r.width, (y ?? r.height * (.05 + Math.random() * .3)) / r.height); return; }
+    const s = document.createElement('i');
     s.className = 'shoot';
     s.style.left = (x ?? r.width * (.35 + Math.random() * .6)) + 'px';
     s.style.top = (y ?? r.height * (.05 + Math.random() * .3)) + 'px';
