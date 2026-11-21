@@ -25,8 +25,8 @@
 <meta property="og:image:alt" content="Akhilesh Rawat's pixel observatory under a starry sky">
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "Akhilesh Rawat", "jobTitle": "Full-stack developer", "description": "Full-stack developer with 5+ years in banking and fintech. I’ve built loan origination and loan management systems, payment and reconciliation platforms, Oracle FLEXCUBE integrations for banks, and ERP and HRMS products for businesses. Along the way, I’ve led development teams and owned delivery end to end.", "url": "https://akku-rawat.github.io/", "email": "mailto:akhileshrawat.asr@gmail.com", "address": {"@type": "PostalAddress", "addressLocality": "Dehradun", "addressCountry": "IN"}, "worksFor": {"@type": "Organization", "name": "Rolaface Softwares"}, "alumniOf": {"@type": "CollegeOrUniversity", "name": "Graphic Era University"}, "knowsAbout": ["React", "TypeScript", "Node.js", "Python", "Java", "NestJS", "FastAPI", "Spring Boot", "PostgreSQL", "GraphQL", "Docker", "CI/CD", "Loan origination", "Loan management", "Payments", "Fraud and AML", "Reconciliation", "ERPNext", "Oracle FLEXCUBE", "ZRA Smart Invoice"], "sameAs": ["https://www.linkedin.com/in/akhilesh-rawat-asr", "https://github.com/Akku-Rawat"]}</script>
-<link rel="stylesheet" href="assets/css/style.css?v=20261117">
-<script src="assets/js/main.js?v=20261117" defer></script>
+<link rel="stylesheet" href="assets/css/style.css?v=20261121">
+<script src="assets/js/main.js?v=20261121" defer></script>
 </head>
 <body>
 
@@ -54,6 +54,7 @@
       <h1>Akhilesh Rawat</h1>
       <p class="sub">Full-stack developer. I build websites, apps and business software, end to end.</p>
       <p class="sub2">Code by day, stars by night.</p>
+      <p class="now-chip"><i class="dot" aria-hidden="true"></i><span id="localTime">Dehradun · IST</span></p>
     </div>
   </div>
 </div>
@@ -61,7 +62,18 @@
 <main>
   <div class="wrap about" id="about">
     <div class="card">
-      <div class="portrait"><canvas id="portrait" aria-hidden="true"></canvas></div>
+      <div class="ask">
+        <button type="button" id="askBtn" aria-expanded="false" aria-controls="bubble" aria-label="Ask me something"><span class="portrait"><canvas id="portrait" aria-hidden="true"></canvas></span></button>
+        <span class="hint" aria-hidden="true">ask me</span>
+        <div class="bubble" id="bubble" hidden>
+          <div class="qs">
+            <button type="button" aria-pressed="false" data-a="I grew up under them, high up in the mountains. Whatever broke in prod that day, one look up and I’m calm again.">Why the stars?</button>
+            <button type="button" aria-pressed="false" data-a="Software that takes the same boring task you do every single day and makes it easy. Even a little enjoyable. Spreadsheets fear me.">What do you love building?</button>
+            <button type="button" aria-pressed="false" data-a="Movies, long walks in nature, and chasing any idea that might make someone’s day a little easier. My notes app is 90% “what if…”.">Off the clock?</button>
+          </div>
+          <p class="a" aria-live="polite">Pick a question.</p>
+        </div>
+      </div>
       <div>
         <p class="label">About me</p>
         <h2>Hi, I’m Akhilesh.</h2>
@@ -72,6 +84,11 @@
           <a class="more" href="#services">Work with me</a>
         </div>
       </div>
+    </div>
+    <div class="now">
+      <div><canvas data-px="build" width="14" height="14" aria-hidden="true"></canvas><div><p class="k">Building</p><p class="v">Something new. Wink wink, you’d know.</p></div></div>
+      <div><canvas data-px="pin" width="14" height="14" aria-hidden="true"></canvas><div><p class="k">Based in</p><p class="v">Dehradun · remote, IST</p></div></div>
+      <div><canvas id="moon" width="14" height="14" role="img" aria-label="Tonight’s moon"></canvas><div><p class="k">Tonight’s sky</p><p class="v" id="moonText">Look up</p></div></div>
     </div>
   </div>
 

@@ -395,4 +395,62 @@
     clearTimeout(copyT); copyT = setTimeout(() => { copyBtn.classList.remove('ok'); copyLabel.textContent = 'Copy'; copyStatus.textContent = ''; }, 2200);
   });
 
+  // Local time chip: Dehradun time and a guess at what I'm doing
+  const clock = $('localTime');
+  const tick = () => {
+    const d = new Date(), h = +d.toLocaleString('en-GB', { timeZone: 'Asia/Kolkata', hour: '2-digit', hour12: false }) % 24;
+    const t = d.toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' }).toLowerCase();
+    clock.textContent = `Dehradun · ${t} · ${h < 6 ? 'asleep (or debugging)' : h < 9 ? 'morning chai' : h < 19 ? 'shipping code' : 'under the stars'}`;
+  };
+  tick(); setInterval(tick, 30000);
+
+  // Ask-me bubble on the portrait
+  const askBtn = $('askBtn'), bub = $('bubble'), ans = bub.querySelector('.a'), qs = bub.querySelectorAll('.qs button');
+  const setOpen = o => { bub.hidden = !o; askBtn.setAttribute('aria-expanded', o); };
+  askBtn.addEventListener('click', () => setOpen(bub.hidden));
+  let typing;
+  qs.forEach(b => b.addEventListener('click', () => {
+    qs.forEach(x => x.setAttribute('aria-pressed', x === b));
+    const s = b.dataset.a; clearInterval(typing);
+    if (reduce) { ans.textContent = s; return; }
+    let n = 0; typing = setInterval(() => { ans.textContent = s.slice(0, ++n); if (n >= s.length) clearInterval(typing); }, 14);
+  }));
+  addEventListener('keydown', e => { if (e.key === 'Escape' && !bub.hidden) { setOpen(false); askBtn.focus(); } });
+  document.addEventListener('click', e => { if (!bub.hidden && !e.target.closest('.ask')) setOpen(false); });
+
+  // Now strip: tonight's real moon phase, from a known new moon (6 Jan 2000 18:14 UTC)
+  const LUN = 29.530588853, NEW = Date.UTC(2000, 0, 6, 18, 14);
+  const moonAge = ms => (((ms - NEW) / 864e5) % LUN + LUN) % LUN;
+  console.assert(Math.min(moonAge(Date.UTC(2024, 3, 8, 18, 21)), LUN - moonAge(Date.UTC(2024, 3, 8, 18, 21))) < 1, 'new moon 8 Apr 2024');
+  console.assert(Math.abs(moonAge(Date.UTC(2024, 8, 18, 2, 34)) - LUN / 2) < 1, 'full moon 18 Sep 2024');
+  const age = moonAge(Date.now()), ang = 2 * Math.PI * age / LUN, lit = Math.round((1 - Math.cos(ang)) / 2 * 100);
+  const phase = ['New moon', 'Waxing crescent', 'First quarter', 'Waxing gibbous', 'Full moon', 'Waning gibbous', 'Last quarter', 'Waning crescent'][Math.round(age / LUN * 8) % 8];
+  $('moonText').textContent = `${phase}, ${lit}% lit`;
+  $('moon').setAttribute('aria-label', `${phase}, ${lit}% lit`);
+  const px14 = (cv, fn) => { const g = cv.getContext('2d'); for (let y = 0; y < 14; y++) for (let x = 0; x < 14; x++) { const c = fn(x, y); if (c) { g.fillStyle = c; g.fillRect(x, y, 1, 1); } } };
+  px14($('moon'), (x, y) => {
+    const nx = (x - 6.5) / 6, ny = (y - 6.5) / 6; if (nx * nx + ny * ny > 1) return;
+    const t = Math.sqrt(1 - ny * ny) * Math.cos(ang), on = age < LUN / 2 ? nx > t : nx < -t;
+    return on ? ((x * 7 + y * 3) % 11 === 0 ? '#E3D9B8' : '#FFF3C9') : '#3A3558';
+  });
+  const PXI = {
+    build: (x, y) => (y > 9 && y < 13 && x > 1 && x < 12) ? '#5D5396' : (y > 2 && y < 10 && x > 3 && x < 10) ? ((x + y) % 2 ? '#7FD1B9' : '#5FA36A') : null,
+    pin: (x, y) => { const d = Math.hypot(x - 6.5, y - 5); return d < 2 ? '#EFE6D8' : d < 4.5 ? '#EDBE6C' : (y > 7 && y < 13 && Math.abs(x - 6.5) < (13 - y) / 2.2) ? '#B8862E' : null; }
+  };
+  document.querySelectorAll('canvas[data-px]').forEach(c => px14(c, PXI[c.dataset.px]));
+
+  // Shooting stars: click the sky or press S; one drifts by on its own at night
+  const sky = $('home');
+  const shoot = (x, y) => {
+    if (reduce) return;
+    const r = sky.getBoundingClientRect(), s = document.createElement('i');
+    s.className = 'shoot';
+    s.style.left = (x ?? r.width * (.35 + Math.random() * .6)) + 'px';
+    s.style.top = (y ?? r.height * (.05 + Math.random() * .3)) + 'px';
+    sky.append(s); s.addEventListener('animationend', () => s.remove());
+  };
+  sky.addEventListener('click', e => { const r = sky.getBoundingClientRect(); shoot(e.clientX - r.left, e.clientY - r.top); });
+  addEventListener('keydown', e => { if (e.key.toLowerCase() === 's' && !e.metaKey && !e.ctrlKey && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) shoot(); });
+  setInterval(() => { if (root.dataset.theme === 'dark' && !document.hidden && sky.getBoundingClientRect().bottom > 0) shoot(); }, 14000);
+
 })();
