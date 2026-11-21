@@ -86,7 +86,7 @@
     morning: { sky: ['#9DBCE2', '#B5CBE7', '#D4DAE4', '#EFE3D4', '#F6D6B4', '#F3C197'],
       r0: '#DCCDDA', r0Hi: '#E8DAE4', r1: '#C7B4CC', r1Hi: '#D4C2D8', r2: '#AE9BBA', r2Hi: '#BEABC8', r3: '#93819F', r3Hi: '#A592AF', ground: '#7F6E8D', groundHi: '#8F7E9C', near: '#5A4A69', nearHi: '#706083',
       snow: '#FFF8F0', snowHi: '#FFFFFF', snowSh: '#EADBE3', forest: '#5F7469', forestHi: '#728679',
-      water: '#93BBD6', water2: '#A7CBE1', waterDeep: '#7FA2BF', waterHi: '#D9EBF4', shore: '#B9D3E2', refl: '#FFFFFF', refl2: '#FFF1CF', page: '#FFFFFF', mist: '#F8F0E6',
+      water: '#93BBD6', water2: '#A7CBE1', waterDeep: '#7FA2BF', waterHi: '#D9EBF4', shore: '#B9D3E2', refl: '#FFFFFF', refl2: '#FFF1CF', page: '#F5F5F7', mist: '#F8F0E6',
       tree: '#3D4D47', treeHi: '#53655C', house: '#EFE6DA', roof: '#7A6A88', win: '#8E7FA0' }
   };
   const CH = {
@@ -472,3 +472,381 @@
   setInterval(() => { if (root.dataset.theme === 'dark' && !document.hidden && sky.getBoundingClientRect().bottom > 0) shoot(); }, 14000);
 
 })();
+
+// Polished cards: a soft light follows the cursor
+document.querySelectorAll('.tile').forEach(t => t.addEventListener('pointermove', e => { const r = t.getBoundingClientRect(); t.style.setProperty('--mx', e.clientX - r.left + 'px'); t.style.setProperty('--my', e.clientY - r.top + 'px'); }));
+
+// Personality: rotating hero line, greeting, notes, kickers, keyboard shortcuts
+{
+  const $ = s => document.querySelector(s), root = document.documentElement, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 1 · rotating hero line
+  const sub = $('.hero .sub');
+  sub.innerHTML = 'Full-stack developer. I build <span class="rot" aria-hidden="true"></span><span class="sr-only">websites, apps, business software and anything that makes life a bit easier.</span>';
+  const words = ['websites.', 'apps.', 'business software.', 'things that make life a bit easier.'], rot = sub.querySelector('.rot');
+  if (reduce) rot.textContent = words[3];
+  else {
+    let w = 0, n = 0, dir = 1;
+    const step = () => {
+      const s = words[w]; n += dir; rot.textContent = s.slice(0, n);
+      let wait = dir > 0 ? 55 : 28;
+      if (dir > 0 && n === s.length) { dir = -1; wait = w === 3 ? 3600 : 1600; }
+      else if (dir < 0 && n === 0) { dir = 1; w = (w + 1) % words.length; wait = 300; }
+      setTimeout(step, wait);
+    };
+    step();
+  }
+
+  // 2 · greeting by the visitor's own time
+  const h = new Date().getHours(), hi = $('.card h2');
+  hi.textContent = (h < 5 ? 'Up late? ' : h < 12 ? 'Good morning, ' : h < 17 ? 'Good afternoon, ' : 'Good evening, ') + 'I’m Akhilesh.';
+
+  // 3 · handwritten notes
+  $('#home').insertAdjacentHTML('beforeend', '<span class="doodle d-me" aria-hidden="true">me, mid-bugfix<svg viewBox="0 0 52 40"><path d="M2 4c20 0 36 10 44 30"/><path d="M38 29l8 5 2-9"/></svg></span>');
+  $('.ask').insertAdjacentHTML('beforeend', '<span class="doodle d-tap" aria-hidden="true">psst, tap me<svg viewBox="0 0 40 26"><path d="M2 22c14 0 26-8 32-20"/><path d="M27 5l7-3 1 8"/></svg></span>');
+
+  // 4 · section kickers (sample lines)
+  $('#work-h').insertAdjacentHTML('afterend', '<p class="kick">Real software, real users, zero buzzwords.</p>');
+  $('#services-h').insertAdjacentHTML('afterend', '<p class="kick">You bring the messy problem. I bring it <b>to life</b>.</p>');
+
+  // 5 · keyboard shortcuts
+  const keys = $('#keys');
+  const toggleKeys = o => { keys.hidden = !o; if (o) keys.querySelector('div').focus?.(); };
+  keys.addEventListener('click', e => { if (e.target === keys) toggleKeys(false); });
+  addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+    const k = e.key.toLowerCase();
+    if (k === '?') toggleKeys(keys.hidden);
+    else if (k === 'escape') toggleKeys(false);
+    else if (k === 't') $('#themeBtn').click();
+    else if (k === 'a') { $('#about').scrollIntoView({ behavior: 'smooth', block: 'center' }); $('#askBtn').click(); }
+    else if (k === 'w') $('#work').scrollIntoView({ behavior: 'smooth' });
+    else if (k === 'r') location.href = 'Akhilesh_Rawat_Resume.pdf';
+  });
+
+}
+
+// Clickable pixel world and secrets
+{
+  const $ = s => document.querySelector(s), hero = $('#home'), reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // secrets: found by exploring
+  const SECRETS = [
+    ['me', 'Say hi to tiny me', 'Night owl'],
+    ['fire', 'Poke the campfire', 'Pyromaniac (the safe kind)'],
+    ['obs', 'Use the telescope', 'Stargazer'],
+    ['wish', 'Make a wish (click the sky or press S)', 'Wishful thinker'],
+    ['keys', 'Press ? for the developer menu', 'Power user'],
+    ['chai', 'Type “chai” anywhere', 'Chai connoisseur'],
+  ];
+  let got = new Set();
+  try { got = new Set(JSON.parse(localStorage.getItem('secrets') || '[]')); } catch (e) {}
+  const save = () => { try { localStorage.setItem('secrets', JSON.stringify([...got])); } catch (e) {} };
+
+  // a tiny pixel trophy for toasts
+  const trophy = cv => { const g = cv.getContext('2d'), M = ['..XXXXXX..', '.XXYYYYXX.', 'XX.YYYY.XX', 'X..YYYY..X', '.X.YYYY.X.', '...YYYY...', '....YY....', '....YY....', '...XXXX...', '..XXXXXX..'];
+    M.forEach((r, y) => [...r].forEach((c, x) => { if (c !== '.') { g.fillStyle = c === 'X' ? '#E9AE45' : '#FFE09A'; g.fillRect(x + 3, y + 3, 1, 1); } })); };
+  let toastT;
+  const toast = html => {
+    document.querySelector('.toast8')?.remove(); clearTimeout(toastT);
+    const t = document.createElement('div'); t.className = 'toast8'; t.setAttribute('role', 'status');
+    t.innerHTML = '<canvas width="16" height="16"></canvas><div>' + html + '</div>'; document.body.append(t); trophy(t.firstChild);
+    toastT = setTimeout(() => t.remove(), 4200);
+  };
+  const find = id => {
+    if (got.has(id)) return; got.add(id); save(); render();
+    const s = SECRETS.find(x => x[0] === id), n = got.size;
+    if (n === SECRETS.length) toast(`<small>All ${n} secrets found</small>You explored everything. Clearly we’d work well together. <a href="#contact">Say hi →</a>`);
+    else toast(`<small>Secret ${n} of ${SECRETS.length}</small>${s[2]}`);
+    document.querySelector('.s-' + id)?.classList.add('found');
+  };
+
+  // secrets list inside the ? menu
+  const menu = $('#keys > div');
+  menu.insertAdjacentHTML('beforeend', '<div class="secrets"><b id="secCount"></b><div class="secret-bar"><i id="secBar"></i></div><ul id="secList"></ul></div>');
+  const render = () => {
+    $('#secCount').textContent = `Secrets found: ${got.size} / ${SECRETS.length}`;
+    $('#secBar').style.width = got.size / SECRETS.length * 100 + '%';
+    $('#secList').innerHTML = SECRETS.map(([id, hint]) => `<li class="${got.has(id) ? 'got' : ''}">${got.has(id) ? hint : '???'}</li>`).join('');
+  };
+  render();
+  new MutationObserver(() => { if (!$('#keys').hidden) find('keys'); }).observe($('#keys'), { attributes: true, attributeFilter: ['hidden'] });
+
+  // clickable spots
+  const say = (spot, lines) => {
+    hero.querySelector('.say8')?.remove();
+    const r = hero.getBoundingClientRect(), s = spot.getBoundingClientRect(), b = document.createElement('div');
+    b.className = 'say8'; b.textContent = lines[Math.floor(Math.random() * lines.length)];
+    b.style.left = Math.min(Math.max(s.left - r.left + s.width / 2, 120), r.width - 120) + 'px'; b.style.top = s.top - r.top - 10 + 'px';
+    hero.append(b); setTimeout(() => b.remove(), 3200);
+  };
+  const ME = ['Hi! Pull up a rock, the fire’s warm.', 'One more commit, then sleep. Probably.', 'It works on my laptop. And my laptop is in the mountains.', 'Chai number four today. Don’t judge.', 'Shh, I’m teaching a spreadsheet to behave.', 'Psst. The telescope does something.', 'Pro tip: press ? on your keyboard.'];
+  const OBS = ['Telescope says: incoming wishes ✨', 'Scanning the sky for bugs… none found.', 'Saturn says hi.'];
+  hero.insertAdjacentHTML('beforeend', SECRETS.slice(0, 3).map(([id, hint]) => `<button type="button" class="spot s-${id}${got.has(id) ? ' found' : ''}" aria-label="${hint}"></button>`).join(''));
+  hero.querySelector('.s-me').addEventListener('click', e => { e.stopPropagation(); say(e.currentTarget, ME); find('me'); });
+  hero.querySelector('.s-fire').addEventListener('click', e => {
+    e.stopPropagation(); find('fire'); if (reduce) return;
+    const r = hero.getBoundingClientRect(), s = e.currentTarget.getBoundingClientRect(), cx = s.left - r.left + s.width / 2, cy = s.top - r.top + s.height * .5;
+    for (let i = 0; i < 18; i++) { const p = document.createElement('i'); p.className = 'spark'; p.style.left = cx + 'px'; p.style.top = cy + 'px'; p.style.background = ['#FFE7A8', '#FFB347', '#E9893A', '#C8452F'][i % 4]; p.style.setProperty('--dx', (Math.random() - .5) * 120 + 'px'); p.style.setProperty('--dy', -40 - Math.random() * 120 + 'px'); p.style.animationDelay = Math.random() * .15 + 's'; hero.append(p); p.addEventListener('animationend', () => p.remove()); }
+  });
+  hero.querySelector('.s-obs').addEventListener('click', e => {
+    e.stopPropagation(); find('obs'); window.openScope?.();
+  });
+
+  // wish: the existing shooting-star triggers
+  hero.addEventListener('click', e => { if (!e.target.closest('.spot')) find('wish'); });
+  let buf = '';
+  addEventListener('keydown', e => {
+    if (!e.isTrusted || e.metaKey || e.ctrlKey || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+    if (e.key.toLowerCase() === 's') find('wish');
+    buf = (buf + e.key.toLowerCase()).slice(-4);
+    if (buf === 'chai') { find('chai'); if (got.size < SECRETS.length) setTimeout(() => toast('<small>Chai refilled</small>Productivity +10%. Typing speed +20%. Sleep −1 hour.'), 4300); }
+  });
+}
+
+// Real sky over Dehradun: constellations, planets, Moon, telescope, meteor showers
+{
+  const $ = s => document.querySelector(s), root = document.documentElement, R = Math.PI / 180;
+  const LAT = 30.3165, LON = 78.0322; // Dehradun
+
+  // Bright stars: [RA hours, Dec degrees, magnitude, colour?]. Lines join star indexes.
+  const SKY = [
+    { n: 'Orion', s: [[5.919, 7.41, .5, '#FFB98A'], [5.419, 6.35, 1.6], [5.679, -1.94, 1.8], [5.604, -1.2, 1.7], [5.533, -.3, 2.2], [5.796, -9.67, 2.1], [5.242, -8.2, .1, '#CFE0FF']],
+      l: [[0, 1], [0, 2], [1, 4], [2, 3], [3, 4], [2, 5], [4, 6]], lab: [[0, 'Betelgeuse'], [6, 'Rigel']],
+      f: 'The hunter. Betelgeuse, his red shoulder, is so huge that if it sat where our Sun is, it would swallow everything out past Mars.' },
+    { n: 'The Big Dipper (Saptarishi)', s: [[11.062, 61.75, 1.8], [11.031, 56.38, 2.4], [11.897, 53.69, 2.4], [12.257, 57.03, 3.3], [12.9, 55.96, 1.8], [13.399, 54.93, 2.2], [13.792, 49.31, 1.9]],
+      l: [[0, 1], [1, 2], [2, 3], [3, 0], [3, 4], [4, 5], [5, 6]], lab: [[0, 'Dubhe']],
+      f: 'In India these are the Saptarishi, the seven sages. Follow the two stars at the end of the bowl and they point straight to Polaris.' },
+    { n: 'Cassiopeia', s: [[.153, 59.15, 2.3], [.675, 56.54, 2.2], [.945, 60.72, 2.2], [1.43, 60.24, 2.7], [1.907, 63.67, 3.4]],
+      l: [[0, 1], [1, 2], [2, 3], [3, 4]], lab: [[1, 'Schedar']],
+      f: 'The W-shaped queen. She sits opposite the Big Dipper around the North Star, so from Dehradun one of the two is almost always up.' },
+    { n: 'Cygnus, the Northern Cross', s: [[20.69, 45.28, 1.3], [20.37, 40.26, 2.2], [19.512, 27.96, 3.1, '#FFD48A'], [20.77, 33.97, 2.5], [19.75, 45.13, 2.9]],
+      l: [[0, 1], [1, 2], [4, 1], [1, 3]], lab: [[0, 'Deneb']],
+      f: 'A swan flying down the Milky Way. Deneb, its tail, shines tens of thousands of times brighter than the Sun.' },
+    { n: 'Lyra', s: [[18.616, 38.78, 0, '#DCE8FF'], [18.746, 37.61, 4.3], [18.835, 33.36, 3.5], [18.982, 32.69, 3.2], [18.908, 36.9, 4.3]],
+      l: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 1]], lab: [[0, 'Vega']],
+      f: 'Vega was the North Star about 12,000 years ago, and Earth’s slow wobble will make it the North Star again around the year 14,000.' },
+    { n: 'Taurus and the Pleiades', s: [[4.599, 16.51, .9, '#FFB98A'], [4.33, 15.63, 3.6], [4.382, 17.54, 3.8], [4.477, 19.18, 3.5], [5.438, 28.61, 1.7], [5.627, 21.14, 3], [3.791, 24.11, 2.9, '#CFE0FF']],
+      l: [[1, 2], [2, 3], [3, 4], [1, 0], [0, 5]], lab: [[0, 'Aldebaran'], [6, 'Pleiades']],
+      f: 'That little cluster is the Pleiades: Krittika in Indian astronomy, and Subaru in Japan. Yes, the car logo.' },
+    { n: 'Gemini', s: [[7.577, 31.89, 1.6], [7.755, 28.03, 1.1, '#FFD48A'], [6.383, 25.13, 3], [7.335, 21.98, 3.5], [6.629, 16.4, 1.9]],
+      l: [[0, 1], [0, 2], [1, 3], [3, 4]], lab: [[0, 'Castor'], [1, 'Pollux']],
+      f: 'The twins. Castor looks like one star, but a telescope shows it is actually six stars orbiting each other.' },
+    { n: 'Leo', s: [[10.14, 11.97, 1.4], [10.122, 16.76, 3.5], [10.333, 19.84, 2.1], [10.278, 23.42, 3.4], [9.764, 23.77, 3], [11.235, 20.52, 2.6], [11.818, 14.57, 2.1], [11.237, 15.43, 3.3]],
+      l: [[0, 1], [1, 2], [2, 3], [3, 4], [2, 5], [5, 6], [6, 7], [7, 0]], lab: [[0, 'Regulus']],
+      f: 'The lion. Every November the Leonid meteors seem to fly out of his mane.' },
+    { n: 'Scorpius', s: [[16.091, -19.81, 2.6], [16.006, -22.62, 2.3], [15.981, -26.11, 2.9], [16.49, -26.43, 1, '#FF9A7A'], [16.598, -28.22, 2.8], [16.836, -34.29, 2.3], [16.865, -38.05, 3], [16.91, -42.36, 3.6], [17.203, -43.24, 3.3], [17.622, -43, 1.9], [17.793, -40.13, 3], [17.708, -39.03, 2.4], [17.56, -37.1, 1.6]],
+      l: [[0, 1], [1, 2], [1, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10], [10, 11], [11, 12]], lab: [[3, 'Antares']],
+      f: 'Antares, the scorpion’s red heart, means “rival of Mars”: the two are often mistaken for each other.' },
+    { n: 'The Great Square of Pegasus', s: [[23.079, 15.21, 2.5], [23.063, 28.08, 2.4, '#FFC9A0'], [.14, 29.09, 2.1], [.22, 15.18, 2.8]],
+      l: [[0, 1], [1, 2], [2, 3], [3, 0]], lab: [[2, 'Alpheratz']],
+      f: 'Hop two stars up from its corner and you can find the Andromeda galaxy: 2.5 million light-years away, the farthest thing your eyes can see.' },
+    { n: 'Canis Major', s: [[6.752, -16.72, -1.5, '#E6F0FF'], [6.378, -17.96, 2], [7.14, -26.39, 1.8], [6.977, -28.97, 1.5], [7.401, -29.3, 2.4]],
+      l: [[1, 0], [0, 2], [2, 3], [2, 4]], lab: [[0, 'Sirius']],
+      f: 'Sirius is the brightest star in the night sky, and one of the closest: its light left only 8.6 years ago.' },
+    { n: 'The Little Dipper', s: [[2.53, 89.26, 2], [17.537, 86.59, 4.4], [16.766, 82.04, 4.2], [15.734, 77.79, 4.3], [14.845, 74.16, 2.1, '#FFC9A0'], [15.345, 71.83, 3], [16.292, 75.76, 5]],
+      l: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 3]], lab: [[0, 'Polaris'], [4, 'Kochab']],
+      f: 'Polaris sits at the tip of its handle. Unlike every other star, it stays put all night while the whole sky wheels around it.' },
+    { n: 'Boötes', s: [[14.261, 19.18, -.1, '#FFC08A'], [14.75, 27.07, 2.4], [15.258, 33.31, 3.5], [15.032, 40.39, 3.5], [14.535, 38.31, 3], [14.53, 30.37, 3.6], [13.911, 18.4, 2.7]],
+      l: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0], [0, 6]], lab: [[0, 'Arcturus']],
+      f: 'Arcturus, the orange star at the bottom of this kite, is the brightest star north of the celestial equator.' },
+    { n: 'Virgo', s: [[13.42, -11.16, 1, '#D6E4FF'], [12.694, -1.45, 2.7], [12.927, 3.4, 3.4], [13.036, 10.96, 2.8], [11.845, 1.76, 3.6], [13.578, -.6, 3.4]],
+      l: [[0, 1], [1, 2], [2, 3], [1, 4], [0, 5], [5, 2]], lab: [[0, 'Spica']],
+      f: 'Spica is Chitra in Indian astronomy. Over 2,000 years ago Hipparchus used it to discover that Earth’s axis slowly wobbles.' },
+    { n: 'Aquila', s: [[19.846, 8.87, .8], [19.771, 10.61, 2.7, '#FFC9A0'], [19.922, 6.41, 3.7], [19.425, 3.11, 3.4], [19.09, 13.86, 3], [20.188, -.82, 3.2]],
+      l: [[1, 0], [0, 2], [0, 3], [1, 4], [2, 5]], lab: [[0, 'Altair']],
+      f: 'Altair spins so fast, one turn in about nine hours, that it is squashed into an egg shape.' },
+    { n: 'Sagittarius, the Teapot', s: [[18.097, -30.42, 3], [18.35, -29.83, 2.7], [18.466, -25.42, 2.8], [18.761, -26.99, 3.2], [18.921, -26.3, 2], [19.116, -27.67, 3.3], [19.044, -29.88, 2.6], [18.403, -34.38, 1.8]],
+      l: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 0], [1, 7], [3, 6]], lab: [[7, 'Kaus Australis']],
+      f: 'The teapot’s spout points at the centre of our galaxy, about 26,000 light-years away, where a giant black hole sits.' },
+    { n: 'Auriga', s: [[5.278, 46, .1, '#FFE6A8'], [5.992, 44.95, 1.9], [5.995, 37.21, 2.6], [5.438, 28.61, 1.7], [4.95, 33.17, 2.7, '#FFC08A'], [5.032, 43.82, 3]],
+      l: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0]], lab: [[0, 'Capella']],
+      f: 'Capella looks like one golden star, but it is four: two pairs of stars orbiting each other.' },
+    { n: 'Perseus', s: [[3.405, 49.86, 1.8], [3.136, 40.96, 2.1], [3.715, 47.79, 3], [3.08, 53.51, 2.9], [3.964, 40.01, 2.9], [3.902, 31.88, 2.9]],
+      l: [[3, 0], [0, 2], [2, 4], [4, 5], [0, 1]], lab: [[0, 'Mirfak'], [1, 'Algol']],
+      f: 'Algol, the “demon star”, visibly dims every 2.87 days when its dimmer companion passes in front of it.' },
+    { n: 'Andromeda', s: [[.14, 29.09, 2.1], [.655, 30.86, 3.3], [1.162, 35.62, 2.1, '#FFB98A'], [2.065, 42.33, 2.2, '#FFD48A'], [.712, 41.27, 3.4, '#C9C2E6']],
+      l: [[0, 1], [1, 2], [2, 3]], lab: [[0, 'Alpheratz'], [4, 'Andromeda galaxy']],
+      f: 'That faint smudge is the Andromeda galaxy: a trillion stars, 2.5 million light-years away, the farthest thing your eyes can see.' },
+    { n: 'Canis Minor', s: [[7.655, 5.22, .4, '#FFF4D8'], [7.453, 8.29, 2.9]],
+      l: [[0, 1]], lab: [[0, 'Procyon']],
+      f: 'Procyon means “before the dog”: it rises just before Sirius, the Dog Star.' },
+    { n: 'Hercules', s: [[17.251, 36.81, 3.2], [16.714, 38.92, 3.5], [16.688, 31.6, 2.8], [17.005, 30.93, 3.9], [16.504, 21.49, 2.8]],
+      l: [[0, 1], [1, 2], [2, 3], [3, 0], [2, 4]], lab: [[2, 'Keystone']],
+      f: 'Along one side of the Keystone hides M13, a ball of several hundred thousand stars older than Earth.' },
+    { n: 'Corona Borealis', s: [[15.464, 29.11, 3.7], [15.549, 31.36, 4.1], [15.578, 26.71, 2.2], [15.712, 26.3, 3.8], [15.827, 26.07, 4.6], [15.96, 26.88, 4.1]],
+      l: [[1, 0], [0, 2], [2, 3], [3, 4], [4, 5]], lab: [[2, 'Alphecca']],
+      f: 'The Northern Crown. Its brightest star, Alphecca, gets its name from Arabic for “the bright one of the broken ring”.' },
+    { n: 'Aries', s: [[2.12, 23.46, 2, '#FFC9A0'], [1.911, 20.81, 2.6], [1.892, 19.29, 3.9]],
+      l: [[0, 1], [1, 2]], lab: [[0, 'Hamal']],
+      f: 'Over 2,000 years ago the Sun crossed into spring right here, which is why astronomers still call that spot the “first point of Aries”.' },
+    { n: 'Capricornus', s: [[20.3, -12.54, 3.6], [20.35, -14.78, 3.1], [20.864, -26.92, 4.1], [21.444, -22.41, 3.7], [21.668, -16.66, 3.7], [21.784, -16.13, 2.9]],
+      l: [[0, 1], [1, 2], [2, 3], [3, 5], [5, 4], [4, 1]], lab: [[5, 'Deneb Algedi']],
+      f: 'One of the oldest constellations: the Babylonians drew it as a sea-goat over 3,000 years ago.' },
+    { n: 'Cepheus', s: [[21.31, 62.59, 2.5], [21.478, 70.56, 3.2], [23.656, 77.63, 3.2], [22.828, 66.2, 3.5], [22.181, 58.2, 3.4, '#FFC08A']],
+      l: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 0], [1, 3]], lab: [[0, 'Alderamin']],
+      f: 'A star here, Delta Cephei, gave its name to Cepheids: the cosmic yardsticks that proved other galaxies exist.' },
+  ];
+  const POLARIS = { n: 'Polaris, the North Star', s: [[2.53, 89.26, 2]], l: [], lab: [[0, 'Polaris']],
+    f: 'It barely moves all night while everything turns around it. From Dehradun it sits about 30° up, which is exactly your latitude.' };
+
+  // sky maths: horizontal coordinates for Dehradun at a given time
+  const jd = ms => ms / 864e5 + 2440587.5;
+  const altAz = (raH, dec, ms) => {
+    const lst = (280.46061837 + 360.98564736629 * (jd(ms) - 2451545) + LON) % 360, H = (lst - raH * 15) * R, d = dec * R, p = LAT * R;
+    const alt = Math.asin(Math.sin(d) * Math.sin(p) + Math.cos(d) * Math.cos(p) * Math.cos(H));
+    const az = Math.atan2(-Math.cos(d) * Math.sin(H), Math.sin(d) * Math.cos(p) - Math.cos(d) * Math.sin(p) * Math.cos(H));
+    return [alt / R, (az / R + 360) % 360];
+  };
+  // low-precision Moon position (good to about a degree)
+  const moonRaDec = ms => {
+    const d = jd(ms) - 2451545, L = (218.316 + 13.176396 * d) * R, M = (134.963 + 13.064993 * d) * R, F = (93.272 + 13.22935 * d) * R;
+    const lon = L + 6.289 * R * Math.sin(M), lat = 5.128 * R * Math.sin(F), e = 23.4397 * R;
+    const ra = Math.atan2(Math.sin(lon) * Math.cos(e) - Math.tan(lat) * Math.sin(e), Math.cos(lon)), dec = Math.asin(Math.sin(lat) * Math.cos(e) + Math.cos(lat) * Math.sin(e) * Math.sin(lon));
+    return [((ra / R + 360) % 360) / 15, dec / R];
+  };
+  // planets from NASA JPL's approximate Keplerian elements (Standish, valid 1800–2050):
+  // [a, e, I, L, long. perihelion, long. node] and their rates per century
+  const EL = {
+    Mercury: [[.38709927, .20563593, 7.00497902, 252.2503235, 77.45779628, 48.33076593], [.00000037, .00001906, -.00594749, 149472.67411175, .16047689, -.12534081]],
+    Venus: [[.72333566, .00677672, 3.39467605, 181.9790995, 131.60246718, 76.67984255], [.0000039, -.00004107, -.0007889, 58517.81538729, .00268329, -.27769418]],
+    Earth: [[1.00000261, .01671123, -.00001531, 100.46457166, 102.93768193, 0], [.00000562, -.00004392, -.01294668, 35999.37244981, .32327364, 0]],
+    Mars: [[1.52371034, .0933941, 1.84969142, -4.55343205, -23.94362959, 49.55953891], [.00001847, .00007882, -.00813131, 19140.30268499, .44441088, -.29257343]],
+    Jupiter: [[5.202887, .04838624, 1.30439695, 34.39644051, 14.72847983, 100.47390909], [-.00011607, -.00013253, -.00183714, 3034.74612775, .21252668, .20469106]],
+    Saturn: [[9.53667594, .05386179, 2.48599187, 49.95424423, 92.59887831, 113.66242448], [-.0012506, -.00050991, .00193609, 1222.49362201, -.41897216, -.28867794]],
+  };
+  const helio = (k, ms) => {
+    const T = (jd(ms) - 2451545) / 36525, [a, e, I, L, wb, O] = EL[k][0].map((v, i) => v + EL[k][1][i] * T);
+    const w = (wb - O) * R, i = I * R, o = O * R; let M = ((L - wb) % 360) * R, E = M;
+    for (let n = 0; n < 8; n++) E = M + e * Math.sin(E);
+    const x = a * (Math.cos(E) - e), y = a * Math.sqrt(1 - e * e) * Math.sin(E);
+    return [(Math.cos(w) * Math.cos(o) - Math.sin(w) * Math.sin(o) * Math.cos(i)) * x + (-Math.sin(w) * Math.cos(o) - Math.cos(w) * Math.sin(o) * Math.cos(i)) * y,
+      (Math.cos(w) * Math.sin(o) + Math.sin(w) * Math.cos(o) * Math.cos(i)) * x + (-Math.sin(w) * Math.sin(o) + Math.cos(w) * Math.cos(o) * Math.cos(i)) * y,
+      Math.sin(w) * Math.sin(i) * x + Math.cos(w) * Math.sin(i) * y];
+  };
+  const planetRaDec = (k, ms) => {
+    const p = helio(k, ms), q = helio('Earth', ms), [x, y0, z0] = p.map((v, i) => v - q[i]), e = 23.4397 * R;
+    const y = y0 * Math.cos(e) - z0 * Math.sin(e), z = y0 * Math.sin(e) + z0 * Math.cos(e);
+    return [((Math.atan2(y, x) / R + 360) % 360) / 15, Math.atan2(z, Math.hypot(x, y)) / R];
+  };
+  const sep = ([r1, d1], [r2, d2]) => Math.acos(Math.sin(d1 * R) * Math.sin(d2 * R) + Math.cos(d1 * R) * Math.cos(d2 * R) * Math.cos((r1 - r2) * 15 * R)) / R;
+  console.assert(sep(planetRaDec('Jupiter', Date.UTC(2020, 11, 21, 18)), planetRaDec('Saturn', Date.UTC(2020, 11, 21, 18))) < .4, 'great conjunction 21 Dec 2020');
+  console.assert(sep(planetRaDec('Venus', Date.UTC(2023, 2, 2)), planetRaDec('Jupiter', Date.UTC(2023, 2, 2))) < 1, 'Venus–Jupiter conjunction 2 Mar 2023');
+  const PLANETS = {
+    Jupiter: { c: '#F2D3A2', f: 'So big that all the other planets would fit inside it. Even binoculars show its four biggest moons, first spotted by Galileo in 1610.' },
+    Saturn: { c: '#EAD08F', f: 'Its main rings stretch about 280,000 km across, yet in most places they are less than a kilometre thick.' },
+    Mars: { c: '#E8794A', f: 'A day on Mars lasts just 37 minutes longer than ours. Its red is rust: iron oxide dust.' },
+    Venus: { c: '#FFF4D6', f: 'The brightest planet. It spins so slowly that a day on Venus is longer than its whole year.' },
+    Mercury: { c: '#C9C2B8', f: 'The fastest planet: one lap around the Sun every 88 days.' },
+  };
+  const LUN = 29.530588853, moonAge = ms => (((ms - Date.UTC(2000, 0, 6, 18, 14)) / 864e5) % LUN + LUN) % LUN;
+  console.assert(Math.abs(altAz(2.53, 89.26, Date.now())[0] - LAT) < 1.5, 'Polaris altitude equals latitude');
+  console.assert(Math.abs(Math.max(...Array.from({ length: 288 }, (_, i) => altAz(6.752, -16.72, Date.now() + i * 3e5)[0])) - (90 - LAT - 16.72)) < .6, 'Sirius peaks at 90 - lat + dec');
+  const wrap = a => ((a + 540) % 360) - 180;
+  const dir = az => ['north', 'north-east', 'east', 'south-east', 'south', 'south-west', 'west', 'north-west'][Math.round(az / 45) % 8];
+  const place = (c, ms) => {
+    const pts = c.s.map(([ra, dec]) => altAz(ra, dec, ms)), alt = pts.reduce((s, p) => s + p[0], 0) / pts.length;
+    const az = (Math.atan2(pts.reduce((s, p) => s + Math.sin(p[1] * R), 0), pts.reduce((s, p) => s + Math.cos(p[1] * R), 0)) / R + 360) % 360;
+    return { ...c, pts, alt, az };
+  };
+
+  // meteor showers: [name, start, peak, end] as month*100+day
+  const SHOWERS = [['Quadrantids', 1228, 103, 112], ['Lyrids', 414, 422, 430], ['Eta Aquariids', 419, 506, 528], ['Perseids', 717, 812, 824], ['Orionids', 1002, 1021, 1107], ['Leonids', 1106, 1117, 1130], ['Geminids', 1204, 1214, 1220]];
+  const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })), md = (today.getMonth() + 1) * 100 + today.getDate();
+  const shower = SHOWERS.find(([, a, , b]) => a <= b ? md >= a && md <= b : md >= a || md <= b);
+  if (shower) {
+    const mt = $('#moonText'); if (mt) mt.textContent += ` · ${shower[0]} active`;
+    setInterval(() => { if (root.dataset.theme === 'dark' && !document.hidden) dispatchEvent(new KeyboardEvent('keydown', { key: 's' })); }, 7000);
+  }
+
+  // what is up right now: the Moon first, then constellations by height, Polaris always
+  const upNow = () => {
+    const ms = Date.now(), list = SKY.map(c => place(c, ms)).filter(c => c.alt > 12).sort((a, b) => b.alt - a.alt);
+    const [mra, mdec] = moonRaDec(ms), [malt, maz] = altAz(mra, mdec, ms);
+    const pl = Object.keys(PLANETS).map(k => { const [ra, dec] = planetRaDec(k, ms), [alt, az] = altAz(ra, dec, ms); return { n: k, planet: k, alt, az, f: PLANETS[k].f }; }).filter(p => p.alt > 5).sort((a, b) => b.alt - a.alt);
+    list.unshift(...pl);
+    if (malt > 3) list.unshift({ n: 'The Moon', moon: true, alt: malt, az: maz });
+    return list;
+  };
+
+  // hero overlay: the real constellations, faint, facing the highest one
+  const hero = $('#home'), ov = document.createElement('canvas');
+  ov.className = 'sky-ov'; ov.setAttribute('aria-hidden', 'true'); hero.append(ov);
+  const drawSky = () => {
+    const w = hero.clientWidth, h = hero.clientHeight, dpr = devicePixelRatio || 1; ov.width = w * dpr; ov.height = h * dpr;
+    const g = ov.getContext('2d'); g.scale(dpr, dpr);
+    const cons = upNow().filter(c => c.pts), az0 = (cons[0] || { az: 180 }).az, px = Math.max(2, Math.round(w / 640));
+    const toXY = ([alt, az]) => [w * (.62 + wrap(az - az0) / 150), h * (.56 - (alt - 12) / 70 * .5)];
+    upNow().filter(p => p.planet).forEach(p => { const [x, y] = toXY([p.alt, p.az]); if (x < w * .3 || x > w || p.alt < 12) return; const s = px * 2; g.fillStyle = PLANETS[p.planet].c; g.shadowColor = PLANETS[p.planet].c; g.shadowBlur = 8; g.fillRect(Math.round(x - s / 2), Math.round(y - s / 2), s, s); g.shadowBlur = 0; g.font = '500 10px ui-monospace,Menlo,monospace'; g.fillStyle = 'rgba(255,236,190,.65)'; g.fillText(p.n, x + 8, y + 3); });
+    cons.forEach(c => {
+      const xy = c.pts.map(toXY); if (xy.every(([x]) => x < w * .3 || x > w)) return;
+      g.strokeStyle = 'rgba(201,194,230,.22)'; g.lineWidth = 1; g.setLineDash([2, 5]);
+      c.l.forEach(([a, b]) => { g.beginPath(); g.moveTo(...xy[a]); g.lineTo(...xy[b]); g.stroke(); });
+      c.s.forEach(([, , mag, col], i) => { const s = mag < 1 ? px * 2 : px; g.fillStyle = col || '#F4F1FF'; g.globalAlpha = Math.max(.45, 1 - mag * .15); g.fillRect(Math.round(xy[i][0] - s / 2), Math.round(xy[i][1] - s / 2), s, s); });
+      g.globalAlpha = 1; g.font = '500 10px ui-monospace,Menlo,monospace'; g.fillStyle = 'rgba(201,194,230,.5)';
+      const [x, y] = xy[c.lab[0][0]]; g.fillText(c.n.replace(/^The /, '').split(/[,(]| and/)[0].trim(), x + 8, y - 6);
+    });
+  };
+  drawSky(); addEventListener('resize', drawSky); setInterval(drawSky, 60000);
+
+  // telescope eyepiece
+  const scope = $('#scope'), eye = $('#eye'), E = eye.getContext('2d');
+  let items = [], idx = 0, opener;
+  const hash = n => { const x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
+  const drawEye = it => {
+    const S = 600, c = S / 2; E.clearRect(0, 0, S, S); E.save(); E.beginPath(); E.arc(c, c, c, 0, 7); E.clip();
+    for (let i = 0; i < 160; i++) { E.fillStyle = `rgba(230,226,255,${.15 + hash(i) * .45})`; E.fillRect(hash(i * 3.1) * S, hash(i * 7.7) * S, 2, 2); }
+    if (it.planet) {
+      const B = 10, n = it.planet === 'Saturn' ? 46 : 30, r = it.planet === 'Saturn' ? 10.5 : 13.5, cx0 = n / 2 - .5, base = PLANETS[it.planet].c;
+      const band = y => it.planet === 'Jupiter' ? ['#F2D3A2', '#C98E62', '#F6E2C0', '#B9784E', '#F2D3A2', '#E4B98A'][Math.floor((y / n) * 9) % 6] : it.planet === 'Saturn' ? (Math.floor(y / 3) % 2 ? '#E2C47E' : '#F0D9A0') : it.planet === 'Mars' ? (hash(y * 3.3) > .7 ? '#C2552E' : base) : base;
+      for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+        const dx = x - cx0, dy = y - cx0, inDisc = Math.hypot(dx, dy) <= r, ring = it.planet === 'Saturn' && Math.abs(Math.hypot(dx / 1, dy / .32) - 19) < 3.2 && Math.abs(Math.hypot(dx, dy / .32) - 19) >= 0;
+        let col = null;
+        if (ring && (!inDisc || dy > 0)) col = Math.abs(Math.hypot(dx, dy / .32) - 19) < 1 ? '#8C7A55' : '#D9C38E';
+        else if (inDisc) col = (dx + dy) > r * .9 ? 'rgba(0,0,0,.35)' : band(y);
+        if (col) { if (col.startsWith('rgba')) { E.fillStyle = band(y); E.fillRect(c - n * B / 2 + x * B, c - n * B / 2 + y * B, B, B); } E.fillStyle = col; E.fillRect(c - n * B / 2 + x * B, c - n * B / 2 + y * B, B, B); }
+      }
+    } else if (it.moon) {
+      const age = moonAge(Date.now()), ang = 2 * Math.PI * age / LUN, B = 10, n = 38, r = n / 2 - .5;
+      for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+        const nx = (x - r) / r, ny = (y - r) / r; if (nx * nx + ny * ny > 1) continue;
+        const t = Math.sqrt(1 - ny * ny) * Math.cos(ang), on = age < LUN / 2 ? nx > t : nx < -t, crater = hash(x * 13 + y * 7) > .93 || Math.hypot(x - 13.5, y - 12.5) < 3.2 || Math.hypot(x - 24.5, y - 23.5) < 2.4 || Math.hypot(x - 22, y - 9) < 1.6;
+        E.fillStyle = on ? (crater ? '#D9CFB0' : '#FFF3C9') : (crater ? '#242040' : '#2B2650'); E.fillRect(c - n * B / 2 + x * B, c - n * B / 2 + y * B, B, B);
+      }
+    } else {
+      const a0 = it.alt, z0 = it.az, pts = it.pts.map(([alt, az]) => [wrap(az - z0) * Math.cos(a0 * R), alt - a0]);
+      const ext = Math.max(4, ...pts.map(([x, y]) => Math.max(Math.abs(x), Math.abs(y)))), k = 200 / ext, P = ([x, y]) => [c + x * k, c - y * k];
+      E.strokeStyle = 'rgba(170,160,255,.4)'; E.lineWidth = 2; E.setLineDash([6, 8]);
+      it.l.forEach(([a, b]) => { E.beginPath(); E.moveTo(...P(pts[a])); E.lineTo(...P(pts[b])); E.stroke(); });
+      E.setLineDash([]);
+      it.s.forEach(([, , mag, col], i) => { const [x, y] = P(pts[i]), r = Math.max(3, 11 - mag * 2.6); E.shadowColor = col || '#C9D4FF'; E.shadowBlur = 24; E.fillStyle = col || '#FFFFFF'; E.beginPath(); E.arc(x, y, r, 0, 7); E.fill(); });
+      E.shadowBlur = 0; E.font = '500 20px ui-monospace,Menlo,monospace'; E.fillStyle = 'rgba(214,208,240,.85)';
+      it.lab.forEach(([i, name]) => { const [x, y] = P(pts[i]); E.fillText(name, x + 16, y - 12); });
+    }
+    E.restore();
+    E.strokeStyle = 'rgba(255,255,255,.07)'; E.lineWidth = 2; E.beginPath(); E.arc(c, c, 180, 0, 7); E.moveTo(c - 20, c); E.lineTo(c + 20, c); E.moveTo(c, c - 20); E.lineTo(c, c + 20); E.stroke();
+  };
+  const show = () => {
+    const it = items[idx], day = root.dataset.theme !== 'dark', age = moonAge(Date.now()), lit = Math.round((1 - Math.cos(2 * Math.PI * age / LUN)) / 2 * 100);
+    $('#scopeName').textContent = it.n;
+    $('#scopeWhere').textContent = `${Math.round(it.alt)}° up in the ${dir(it.az)}` + (it.moon ? ` · ${lit}% lit` : '') + (day ? ' · hidden by daylight right now' : ' · visible now');
+    $('#scopeFact').textContent = it.moon ? 'It drifts about 3.8 cm farther from Earth every year, roughly as fast as your fingernails grow.' : it.f;
+    if (it.planet) $('#scopeName').textContent = it.n + ' (planet)';
+    $('#scopeN').textContent = `${idx + 1} of ${items.length}`;
+    eye.setAttribute('aria-label', `Telescope view of ${it.n}`);
+    drawEye(it);
+  };
+  const open = () => {
+    items = upNow(); idx = 0; opener = document.activeElement;
+    $('#scopeTime').textContent = 'Telescope · Dehradun · ' + new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' }).toLowerCase();
+    const sh = $('#scopeShower'); sh.hidden = !shower; if (shower) sh.textContent = `☄ ${shower[0]} meteor shower is active`;
+    scope.hidden = false; show(); $('#scopeX').focus();
+  };
+  const close = () => { scope.hidden = true; opener?.focus?.(); };
+  $('#scopeX').addEventListener('click', close);
+  scope.addEventListener('click', e => { if (e.target === scope) close(); });
+  $('#scopePrev').addEventListener('click', () => { idx = (idx - 1 + items.length) % items.length; show(); });
+  $('#scopeNext').addEventListener('click', () => { idx = (idx + 1) % items.length; show(); });
+  addEventListener('keydown', e => { if (scope.hidden) return; if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') $('#scopeNext').click(); if (e.key === 'ArrowLeft') $('#scopePrev').click(); });
+  window.openScope = open;
+}

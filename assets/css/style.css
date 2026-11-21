@@ -203,7 +203,8 @@ main > section{padding-top:112px;scroll-margin-top:0}
 .bubble .qs button{font:inherit;font-size:13px;color:var(--link);background:none;border:1px solid var(--line);border-radius:980px;padding:6px 12px;cursor:pointer}
 .bubble .qs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
 .bubble .a{margin-top:10px;line-height:1.5;min-height:4.5em}
-@media (max-width:720px){.ask{margin-bottom:14px}.ask .hint{left:28px}}
+@media (max-width:760px){.ask{margin-bottom:14px}}
+@media (max-width:720px){.ask .hint{left:28px}}
 
 /* Now strip */
 .now{max-width:760px;margin:14px auto 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
@@ -218,3 +219,170 @@ main > section{padding-top:112px;scroll-margin-top:0}
 .shoot{position:absolute;z-index:1;width:90px;height:2px;pointer-events:none;background:linear-gradient(90deg,#FFE09A,transparent);border-radius:2px;transform-origin:left center;animation:shoot .9s var(--ease) forwards}
 .shoot::before{content:"";position:absolute;left:-2px;top:-1px;width:4px;height:4px;background:#FFF6D8;box-shadow:0 0 8px 2px #FFE09A}
 @keyframes shoot{from{opacity:0;transform:rotate(-155deg) translateX(0)}15%{opacity:1}to{opacity:0;transform:rotate(-155deg) translateX(-220px)}}
+
+/* Polished theme. Everything scoped under :rootso the concept can switch it off.
+   Apple blue stays the only accent; the pixel art is untouched. Polish comes from surfaces, depth, type and motion. */
+
+/* Surfaces: Apple grey canvas with white cards (light), near-black with hairline glass cards (dark) */
+:root{
+  --bg:#F5F5F7; --tile:#FFFFFF; --raise:#FFFFFF; --edge:rgba(0,0,0,.06); --line:#E3E3E8;
+  --bar:rgba(255,255,255,.72);
+  --shadow:0 1px 1px rgba(0,0,0,.03),0 10px 28px -14px rgba(0,0,0,.14);
+  --shadow-hi:0 2px 4px rgba(0,0,0,.04),0 28px 56px -24px rgba(0,0,0,.26);
+  --hl:inset 0 1px 0 rgba(255,255,255,0);
+}
+:root[data-theme="dark"]{
+  --bg:#0B0B10; --tile:#14141B; --raise:#15151D; --edge:rgba(255,255,255,.08); --line:#25252F;
+  --bar:rgba(20,20,27,.66);
+  --shadow:0 18px 40px -26px rgba(0,0,0,.9);
+  --shadow-hi:0 30px 60px -28px rgba(0,0,0,.95);
+  --hl:inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+/* Type: tighter, heavier display, Apple product-page rhythm */
+.hero h1{letter-spacing:-.045em}
+.h2{font-size:clamp(34px,4.2vw,52px);font-weight:700;letter-spacing:-.04em;line-height:1.04;margin-bottom:36px}
+.card h2{font-size:26px;letter-spacing:-.03em}
+.work h3,.side h3,.note h3{letter-spacing:-.025em}
+.hire-top h3{font-size:clamp(28px,3vw,36px);letter-spacing:-.035em;font-weight:700}
+main > section{padding-top:128px}
+
+/* Floating glass nav on desktop */
+@media (min-width:901px){
+  .topbar{position:fixed;left:0;right:0;top:14px;background:none;border:0;-webkit-backdrop-filter:none;backdrop-filter:none;pointer-events:none}
+  .topbar .wrap{pointer-events:auto;max-width:920px;height:50px;padding:0 8px 0 22px;border-radius:980px;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);border:1px solid var(--edge);box-shadow:var(--shadow),var(--hl)}
+  .nav{gap:2px}
+  .nav a{padding:7px 14px;border-radius:980px;opacity:.68;transition:background-color .25s,opacity .25s}
+  .nav a.on{background:color-mix(in srgb,var(--text) 8%,transparent);opacity:1}
+  .hero-over .wrap{padding-top:clamp(92px,7vw,116px)}
+}
+
+/* Buttons: soft top light, tinted shadow, a little press */
+.btn,.pill-sm,.btn:hover,.pill-sm:hover{background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 86%,#fff),var(--accent))}
+.btn,.pill-sm{box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 1px 2px rgba(0,0,0,.16),0 10px 22px -10px color-mix(in srgb,var(--accent) 80%,transparent);transition:transform .2s var(--ease),filter .2s}
+.btn:hover,.pill-sm:hover{filter:brightness(1.07);transform:translateY(-1px)}
+.btn:active,.pill-sm:active{transform:scale(.98)}
+.btn.ghost{background:none;box-shadow:inset 0 0 0 1px var(--line);color:var(--text)}
+.btn.ghost:hover{background:color-mix(in srgb,var(--text) 6%,transparent);transform:none;filter:none}
+
+/* Cards: white on grey, hairline edge, lift and a soft light that follows the cursor */
+.card{border-radius:30px;border:1px solid var(--edge);box-shadow:var(--shadow-hi),var(--hl)}
+.tile{border-radius:28px;border:1px solid var(--edge);box-shadow:var(--shadow),var(--hl);position:relative;isolation:isolate;overflow:hidden;transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s,border-color .3s}
+.tile::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;background:radial-gradient(380px circle at var(--mx,50%) var(--my,-30%),color-mix(in srgb,var(--accent) 8%,transparent),transparent 65%);opacity:0;transition:opacity .35s}
+.tile:hover::before{opacity:1}
+@media (hover:hover){.work:hover,.side:hover{transform:translateY(-4px);box-shadow:var(--shadow-hi),var(--hl)}}
+:root[data-theme="dark"] .tile:hover{border-color:rgba(255,255,255,.14)}
+.ico{width:44px;height:44px;border-radius:12px;box-shadow:0 0 0 1px var(--edge),0 8px 16px -8px rgba(0,0,0,.4)}
+.badge{background:none;box-shadow:inset 0 0 0 1px var(--line)}
+.now>div{background:var(--tile);border-radius:22px;box-shadow:var(--shadow),var(--hl)}
+.bubble{border-radius:20px;box-shadow:var(--shadow-hi)}
+
+/* Work with me: a dark feature card, like Apple's closing panels, in both themes */
+.hire{--text:#F5F5F7;--muted:#A1A1AA;--line:rgba(255,255,255,.1);--link:#4DA3FF;--ok:#30D158;--edge:rgba(255,255,255,.08);
+  color:var(--text);padding:44px 48px;border-radius:32px;background:radial-gradient(120% 150% at 88% -10%,#26254A 0%,#14141F 45%,#0E0E13 100%);box-shadow:var(--shadow-hi),inset 0 1px 0 rgba(255,255,255,.07)}
+.hire::before{display:none}
+.hire .art,.hire .mailbox{box-shadow:0 0 0 1px rgba(255,255,255,.08),0 18px 36px -16px rgba(0,0,0,.8)}
+@media (max-width:720px){.hire{padding:28px 22px}}
+
+/* Fine grain on the page body (not the pixel art) */
+main{position:relative}
+main::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:30;opacity:.05;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+::selection{background:color-mix(in srgb,var(--accent) 22%,transparent)}
+.foot .wrap{border-top-color:var(--line)}
+
+/* Personality: rotating line, notes, kickers, shortcuts */
+/* 1 · rotating hero line */
+.rot{color:var(--hero-name);white-space:nowrap}
+.rot::after{content:"";display:inline-block;width:2px;height:1em;margin-left:3px;vertical-align:-.12em;background:currentColor;animation:caret 1s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+
+/* 3 · handwritten notes */
+.doodle{position:absolute;z-index:6;font:600 22px/1 Caveat,"Bradley Hand","Segoe Print",cursive;color:var(--text);pointer-events:none;white-space:nowrap}
+.doodle svg{position:absolute;overflow:visible;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.d-me{left:56%;top:57%;color:var(--hero-name);text-shadow:0 1px 8px var(--hero-shadow);transform:rotate(-4deg)}
+.d-me svg{left:104px;top:12px;width:60px;height:46px}
+.d-tap{left:-122px;top:78px;transform:rotate(-6deg);color:var(--muted)}
+.d-tap svg{left:96px;top:-20px;width:40px;height:26px}
+@media (max-width:1100px){.d-tap{display:none}}
+@media (max-width:900px){.d-me{display:none}}
+
+/* 4 · section kickers */
+.kick{font:600 24px/1.2 Caveat,"Bradley Hand",cursive;color:var(--muted);margin:-24px 0 34px;transform:rotate(-1.2deg);transform-origin:left;opacity:.9}
+.kick b{font-weight:600;color:var(--accent)}
+
+/* 5 · keyboard shortcuts */
+.keys kbd{font:600 11px/1 var(--mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:3px 6px;background:var(--tile);color:var(--text)}
+.keys{position:fixed;inset:0;z-index:70;display:grid;place-items:center;background:rgba(0,0,0,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.keys[hidden]{display:none}
+.keys>div{width:min(360px,calc(100vw - 32px));background:var(--raise);color:var(--text);border:1px solid var(--edge);border-radius:24px;padding:22px 24px;box-shadow:var(--shadow-hi)}
+.keys h3{font-size:19px;margin-bottom:12px}
+.keys ul{list-style:none;margin:0;padding:0;display:grid;gap:10px;font-size:15px}
+.keys li{display:flex;justify-content:space-between;gap:16px;align-items:center}
+.keys p{margin-top:14px;font-size:13px;color:var(--muted)}
+
+/* Clickable world and secrets */
+/* clickable spots in the pixel world */
+.spot{position:absolute;z-index:4;border:0;padding:0;background:none;cursor:pointer;border-radius:12px}
+.spot:focus-visible{outline:2px dashed var(--hero-name);outline-offset:2px}
+.spot::after{content:"";position:absolute;left:50%;top:-4px;width:4px;height:4px;margin-left:-2px;background:#FFE09A;box-shadow:0 0 6px 1px rgba(255,224,154,.55);border-radius:1px;animation:blink 3.2s ease-in-out infinite;opacity:0}
+.spot:not(.found)::after{opacity:1}
+@keyframes blink{0%,100%{opacity:.9}50%{opacity:.1}}
+.spot:hover::after{opacity:1;animation:none;transform:scale(1.4)}
+.s-me{left:64%;top:66%;width:5%;height:20%}
+.s-fire{left:59%;top:76%;width:4%;height:12%}
+.s-obs{left:79%;top:37%;width:6%;height:17%}
+@media (max-width:720px){.s-me{left:51%;top:78%;width:8%;height:16%}.s-fire{left:40%;top:85%;width:7%;height:10%}.s-obs{left:64%;top:56%;width:10%;height:13%}}
+
+/* pixel speech bubble */
+.say8{position:absolute;z-index:7;transform:translate(-50%,-100%);max-width:min(260px,70vw);background:#FFFDF6;color:#1D1D1F;font:600 12px/1.45 var(--mono);padding:9px 12px;border:2px solid #1D1D1F;box-shadow:4px 4px 0 #1D1D1F;animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
+.say8::after{content:"";position:absolute;left:50%;bottom:-8px;width:8px;height:8px;background:#FFFDF6;border-right:2px solid #1D1D1F;border-bottom:2px solid #1D1D1F;transform:translateX(-50%) rotate(45deg)}
+@keyframes pop{from{opacity:0;transform:translate(-50%,-80%) scale(.6)}}
+
+/* sparks from the fire */
+.spark{position:absolute;z-index:5;width:4px;height:4px;pointer-events:none;animation:spark 1s ease-out forwards}
+@keyframes spark{to{transform:translate(var(--dx),var(--dy));opacity:0}}
+
+/* project icons hop on hover */
+@media (hover:hover){.tile:hover .ico{animation:hop .5s cubic-bezier(.3,1.8,.5,1)}}
+@keyframes hop{40%{transform:translateY(-6px) rotate(-6deg)}}
+
+/* toast for secrets */
+.toast8{position:fixed;z-index:80;left:50%;bottom:24px;-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);transform:translateX(-50%);display:flex;align-items:center;gap:12px;background:var(--raise);color:var(--text);border:1px solid var(--edge);border-radius:18px;padding:12px 16px 12px 12px;box-shadow:var(--shadow-hi);font-size:14px;animation:rise .45s cubic-bezier(.2,1.4,.4,1)}
+.toast8 canvas{width:36px;height:36px;image-rendering:pixelated;border-radius:8px;background:#1B1830}
+.toast8 small{display:block;font:500 11px/1.3 var(--mono);color:var(--muted)}
+.toast8 a{font-weight:600}
+@keyframes rise{from{opacity:0;transform:translate(-50%,20px)}}
+
+/* secrets list in the ? menu */
+.secrets{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.secrets b{font-size:14px}
+.secrets ul{margin-top:8px;gap:6px!important;font-size:13px!important}
+.secrets li{justify-content:flex-start!important;gap:8px!important;color:var(--muted)}
+.secrets li.got{color:var(--text)}
+.secrets li::before{content:"○"}
+.secrets li.got::before{content:"●";color:#E9AE45}
+.secret-bar{height:4px;border-radius:4px;background:var(--line);margin-top:8px;overflow:hidden}
+.secret-bar i{display:block;height:100%;background:linear-gradient(90deg,#E9AE45,#FFE09A);transition:width .5s}
+
+/* Real sky: constellations, telescope */
+/* real constellations over the night hero */
+.sky-ov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;opacity:0;transition:opacity 1s;-webkit-mask-image:linear-gradient(90deg,transparent 40%,#000 58%);mask-image:linear-gradient(90deg,transparent 40%,#000 58%)}
+:root[data-theme="dark"] .sky-ov{opacity:1}
+@media (max-width:720px){.sky-ov{display:none}}
+
+/* telescope eyepiece */
+.scope{position:fixed;inset:0;z-index:75;display:grid;place-items:center;background:rgba(4,4,10,.62);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.scope[hidden]{display:none}
+.scope .box{position:relative;width:min(420px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;background:#0E0D18;color:#F1EEF8;border:1px solid rgba(255,255,255,.1);border-radius:28px;padding:18px 22px 22px;box-shadow:0 40px 80px -30px #000,inset 0 1px 0 rgba(255,255,255,.06);text-align:center;animation:pop2 .4s cubic-bezier(.2,1.3,.4,1)}
+@keyframes pop2{from{opacity:0;transform:scale(.92)}}
+.scope .top8{display:flex;justify-content:space-between;align-items:center;font:500 12px/1.3 var(--mono);color:#A9A3C9;text-align:left}
+.scope .top8 button{background:rgba(255,255,255,.08);border:0;border-radius:50%;color:#F1EEF8;font-size:20px;line-height:1;cursor:pointer;width:36px;height:36px;flex:none}
+.eye{display:block;width:min(300px,72vw);height:auto;aspect-ratio:1;margin:18px auto 0;border-radius:50%;background:radial-gradient(circle,#15123A 0%,#08070F 72%);box-shadow:0 0 0 10px #1A1928,0 0 0 12px #2D2B42,0 24px 50px -12px rgba(0,0,0,.9)}
+.scope h3{font-size:24px;letter-spacing:-.025em;margin-top:24px;color:#fff}
+.scope .where{font:500 12px/1.5 var(--mono);color:#B3ACD6;margin-top:6px}
+.scope .fact{font-size:15px;line-height:1.55;color:#D9D5EB;margin-top:12px;text-wrap:pretty}
+.scope .nav8{display:flex;justify-content:space-between;align-items:center;margin-top:18px}
+.scope .nav8 button{font:500 14px/1 var(--font);color:#F1EEF8;background:rgba(255,255,255,.08);border:0;border-radius:980px;padding:12px 16px;cursor:pointer}
+.scope .nav8 button:hover{background:rgba(255,255,255,.14)}
+.scope .nav8 span{font:500 12px var(--mono);color:#A9A3C9}
+.scope .shower{display:inline-block;margin-top:14px;font:500 12px/1.4 var(--mono);color:#FFE09A;background:rgba(255,224,154,.1);border-radius:980px;padding:5px 11px}
